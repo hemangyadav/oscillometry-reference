@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oscillometry Reference Calculator</title>
+<meta name="description" content="Predicted values, limits of normal and z-scores for impulse and forced oscillometry (Jaeger, Resmon, tremoflo). Runs entirely in the browser.">
+<style>
+/* Layout: instrument-panel header, a single input band, one full-width results table with an inline z-strip per row, equation card, reference footer. */
+:root {
+  --bg: #f5f7f8;
+  --panel: #ffffff;
+  --ink: #16212a;
+  --muted: #5b6b77;
+  --line: #d9e0e5;
+  --line-soft: #e9eef1;
+  --accent: #0e6f86;
+  --accent-soft: #e2f0f3;
+  --band: #d7ebef;
+  --low: #b3261e;
+  --low-soft: #fbe9e7;
+  --warn: #8a5a00;
+  --warn-soft: #fdf3dc;
+  --warn-line: #efd18a;
+  --dot: #0e6f86;
+  --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-num: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1519; --panel: #161e23; --ink: #e3eaee; --muted: #93a4af; --line: #2a363e; --line-soft: #1f2a31;
+    --accent: #5cc2d6; --accent-soft: #173239; --band: #1d3a41; --low: #ff8a80; --low-soft: #3a1c1a;
+    --warn: #f2c35b; --warn-soft: #2e2512; --warn-line: #5c4a1d; --dot: #5cc2d6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1519; --panel: #161e23; --ink: #e3eaee; --muted: #93a4af; --line: #2a363e; --line-soft: #1f2a31;
+  --accent: #5cc2d6; --accent-soft: #173239; --band: #1d3a41; --low: #ff8a80; --low-soft: #3a1c1a;
+  --warn: #f2c35b; --warn-soft: #2e2512; --warn-line: #5c4a1d; --dot: #5cc2d6; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+h1 { font-size: 1.45rem; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h1 small { font-weight: 400; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.02em; margin-left: 6px; }
+.ruo { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--low); border: 1px solid currentColor; border-radius: 3px; padding: 2px 6px; white-space: nowrap; }
+h2 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin: 0 0 10px; font-weight: 600; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; min-width: 0; }
+
+/* Inputs */
+.inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 22px; }
+.field { display: grid; gap: 4px; min-width: 0; align-content: start; }
+.field > label, .field > .lbl { font-size: 0.76rem; color: var(--muted); font-weight: 600; letter-spacing: 0.02em; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+input[type="number"], select {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px;
+  padding: 6px 8px; width: 100%; min-width: 0; font-variant-numeric: tabular-nums;
+}
+input[type="number"] { font-family: var(--font-num); font-size: 0.92rem; }
+input:focus-visible, select:focus-visible, button:focus-visible, .seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 1px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--bg); width: 100%; }
+.seg label { flex: 1; position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg span { display: block; text-align: center; padding: 6px 8px; font-size: 0.86rem; cursor: pointer; border-left: 1px solid var(--line); white-space: nowrap; }
+.seg label:first-child span { border-left: 0; }
+.seg input:checked + span { background: var(--accent); color: var(--panel); font-weight: 600; }
+.seg input:disabled + span { opacity: 0.4; cursor: not-allowed; }
+.readout { font-family: var(--font-num); font-size: 0.92rem; padding: 6px 0; color: var(--muted); }
+.hint { font-size: 0.74rem; color: var(--muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+button { font: inherit; font-size: 0.84rem; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 4px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--accent); color: var(--accent); }
+.tag { display: inline-block; font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; border-radius: 3px; padding: 1px 5px; vertical-align: 1px; }
+.tag.p1 { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-line); }
+.tag.def { background: var(--accent-soft); color: var(--accent); }
+
+/* Alerts */
+#alerts { display: grid; gap: 8px; }
+#alerts:empty { display: none; }
+.alert { border: 1px solid var(--warn-line); background: var(--warn-soft); color: var(--ink); border-radius: var(--r); padding: 9px 12px; font-size: 0.88rem; }
+.alert b { color: var(--warn); }
+.alert.info { border-color: var(--line); background: var(--panel); }
+.alert.info b { color: var(--accent); }
+
+/* Results */
+.res-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; margin-bottom: 8px; }
+.res-head h2 { margin: 0; }
+.res-meta { font-size: 0.8rem; color: var(--muted); }
+.res-meta b { color: var(--ink); font-weight: 600; }
+.tablewrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px; }
+table { border-collapse: collapse; width: 100%; min-width: 860px; font-variant-numeric: tabular-nums; }
+th, td { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--line-soft); white-space: nowrap; vertical-align: middle; }
+th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); }
+th.l, td.l { text-align: left; }
+td.num { font-family: var(--font-num); font-size: 0.86rem; }
+td.pname { font-weight: 600; position: sticky; left: 0; background: var(--panel); z-index: 1; }
+th.pcol { position: sticky; left: 0; background: var(--panel); z-index: 1; }
+td.pname .sub { font-weight: 400; color: var(--muted); font-size: 0.78rem; margin-left: 4px; }
+td.pname .via { display: block; font-weight: 400; font-size: 0.7rem; color: var(--muted); }
+tr.phase td.pname { padding-left: 22px; font-weight: 400; }
+tr.grp td { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; padding-top: 12px; border-bottom: 1px solid var(--line); }
+tr.noeq td { color: var(--muted); }
+td.meas input { width: 90px; text-align: right; padding: 4px 6px; }
+td.unit { color: var(--muted); font-size: 0.74rem; text-align: left; }
+td.zc { font-weight: 700; }
+td.zc.ab { color: var(--low); }
+.flag { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 1px 7px; border-radius: 10px; }
+.flag.ab { background: var(--low-soft); color: var(--low); }
+.flag.ok { color: var(--muted); }
+.why { font-size: 0.74rem; color: var(--muted); text-align: left; white-space: normal; min-width: 150px; }
+.strip { display: block; }
+.strip .band { fill: var(--band); }
+.strip .axis { stroke: var(--line); stroke-width: 1; }
+.strip .zero { stroke: var(--muted); stroke-width: 1; }
+.strip .dot { fill: var(--dot); stroke: var(--panel); stroke-width: 1.5; }
+.strip .dot.ab { fill: var(--low); }
+.strip text { fill: var(--muted); font-family: var(--font-num); font-size: 9px; }
+.toggle-more { margin-top: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.76rem; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 18px; height: 9px; background: var(--band); vertical-align: -1px; margin-right: 5px; border-radius: 2px; }
+
+/* Equation card */
+.eq { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px 28px; }
+.eq h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.eq p { margin: 0 0 6px; max-width: 65ch; }
+.eq dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 8px 0 0; font-size: 0.86rem; }
+.eq dt { color: var(--muted); }
+.eq dd { margin: 0; }
+.eq ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: 65ch; }
+a { color: var(--accent); }
+
+footer { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 10px; font-size: 0.8rem; color: var(--muted); }
+footer .ruo-line { color: var(--ink); font-weight: 700; font-size: 0.9rem; }
+footer ol { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+footer p { margin: 0; max-width: 80ch; }
+#loadError { border: 1px solid var(--low); background: var(--low-soft); color: var(--ink); padding: 12px; border-radius: var(--r); }
+
+@media (max-width: 720px) {
+  .eq { grid-template-columns: 1fr; }
+  h1 { font-size: 1.25rem; }
+  td.meas input { width: 72px; }
+  .swipe { display: block !important; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Oscillometry Reference Calculator <small>IOS · FOT · AOS</small></h1>
+    <span class="ruo">Research use only</span>
+  </header>
+
+  <div id="loadError" hidden></div>
+
+  <section class="panel" aria-labelledby="h-inputs">
+    <h2 id="h-inputs">Subject and test</h2>
+    <form class="inputs" id="form" autocomplete="off" novalidate>
+      <div class="field">
+        <span class="lbl" id="lbl-sex">Sex</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lbl-sex">
+          <label><input type="radio" name="sex" id="sexM" value="M" checked><span>Male</span></label>
+          <label><input type="radio" name="sex" id="sexF" value="F"><span>Female</span></label>
+        </div>
+        <div class="row2" style="margin-top:8px">
+          <div class="field"><label for="age">Age (years)</label><input type="number" id="age" step="0.1" min="0" max="110" inputmode="decimal"></div>
+          <div class="field"><span class="lbl">BMI (kg/m²)</span><div class="readout" id="bmi">–</div></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label for="height">Height (cm)</label><input type="number" id="height" step="0.1" min="50" max="230" inputmode="decimal"></div>
+          <div class="field"><label for="weight">Weight (kg)</label><input type="number" id="weight" step="0.1" min="5" max="300" inputmode="decimal"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="lbl" id="lbl-dev">Device</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lbl-dev">
+          <label><input type="radio" name="device" id="devJ" value="Jaeger" checked><span>Jaeger</span></label>
+          <label><input type="radio" name="device" id="devR" value="Resmon"><span>Resmon</span></label>
+          <label><input type="radio" name="device" id="devT" value="Tremoflo"><span>tremoflo</span></label>
+        </div>
+        <div class="field" id="waveField" style="margin-top:8px" hidden>
+          <label for="wave">tremoflo waveform</label>
+          <select id="wave">
+            <option value="">Not specified</option>
+            <option value="5-37">AOS 5-37 (Adult)</option>
+            <option value="7-41">AOS 7-41 (Pediatric)</option>
+          </select>
+        </div>
+        <div class="field" style="margin-top:8px">
+          <span class="lbl" id="lbl-unit">Units of entered pressures</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-unit">
+            <label><input type="radio" name="unit" id="uK" value="kPa" checked><span>kPa</span></label>
+            <label><input type="radio" name="unit" id="uC" value="cmH2O"><span>cmH₂O</span></label>
+            <label><input type="radio" name="unit" id="uH" value="hPa"><span>hPa</span></label>
+          </div>
+          <span class="hint">R and X per L/s, AX per L. Fres is always Hz.</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="eqsel">Reference equation</label>
+        <select id="eqsel"></select>
+        <span class="hint" id="eqhint"></span>
+        <div class="field" style="margin-top:8px">
+          <span class="lbl" id="lbl-phase">Breath phase</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-phase">
+            <label><input type="radio" name="phase" id="phW" value="whole" checked><span>Whole breath</span></label>
+            <label><input type="radio" name="phase" id="phB" value="within"><span>+ Within-breath</span></label>
+          </div>
+          <span class="hint" id="phasehint"></span>
+        </div>
+        <div class="actions" style="margin-top:10px">
+          <button type="button" id="btnExample">Load example</button>
+          <button type="button" id="btnClear">Clear</button>
+          <span class="hint" id="exampleNote"></span>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <div id="alerts" aria-live="polite"></div>
+
+  <section class="panel" aria-labelledby="h-res">
+    <div class="res-head">
+      <h2 id="h-res">Results</h2>
+      <div class="res-meta" id="resmeta"></div>
+    </div>
+    <div class="hint swipe" style="display:none;margin-bottom:6px">Swipe the table sideways for limits, z-scores and flags.</div>
+    <div class="tablewrap">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th class="l pcol">Parameter</th>
+            <th>Measured</th>
+            <th class="l">Unit</th>
+            <th>Predicted</th>
+            <th>LLN</th>
+            <th>ULN</th>
+            <th>z</th>
+            <th>% pred</th>
+            <th class="l" id="stripHead">z-score</th>
+            <th class="l">Flag</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="actions toggle-more">
+      <button type="button" id="btnMore" hidden></button>
+      <button type="button" id="btnNoEq" hidden></button>
+    </div>
+    <div class="legend">
+      <span><i></i>−1.645 to +1.645 (5th to 95th percentile)</span>
+      <span>Abnormal: X below LLN (z &lt; −1.645); R, R differences, AX, Fres and |Z| above ULN (z &gt; +1.645)</span>
+      <span>z &gt; 0 means measured above predicted, for every parameter</span>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-eq">
+    <h2 id="h-eq">Equation in use</h2>
+    <div class="eq" id="eqcard"></div>
+  </section>
+
+  <footer>
+    <div class="ruo-line">Research use only, not for clinical decisions.</div>
+    <p>Everything runs in this browser tab. Nothing you enter is sent anywhere or stored; closing the page discards it. The page loads only its own files and makes no analytics or third-party requests.</p>
+    <div>
+      <div style="margin-bottom:4px">Equations</div>
+      <ol id="cites"></ol>
+    </div>
+    <p id="buildline"></p>
+  </footer>
+</div>
+
+<script src="js/refeq.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  // Device parameter lists (what each device exports; not coefficients) ------
+  const DEVICE_PARAMS = {
+    Jaeger: ["R5", "R10", "R15", "R20", "R5_R20", "R5_R15", "X5", "X10", "X15", "X20", "AX", "Fres"],
+    Resmon: ["R5", "R11", "R19", "R5_R19", "X5", "X11", "X19", "Z5", "AX", "Fres"],
+    Tremoflo: ["R5", "R11", "R19", "R5_R19", "X5", "X11", "X19", "AX", "Fres"]
+  };
+  // Other frequencies a device can report, shown only when the chosen set has them
+  const DEVICE_EXTRA = {
+    Jaeger: [],
+    Resmon: ["R8", "X8"],
+    Tremoflo: ["R7", "R13", "R17", "R23", "R29", "R31", "R37", "R41", "R7_R19", "X7", "X13", "X17"]
+  };
+  const DEVICE_UNIT = { Jaeger: "kPa", Resmon: "cmH2O", Tremoflo: "cmH2O" };
+  const PAPER1_ONLY = ["nowowiejska2008", "wu2022"];
+
+  // Example values for illustration only (the Jaeger example shows one reactance flag)
+  const EXAMPLES = {
+    Jaeger: { sex: "M", age: 45, height: 175, weight: 80, unit: "kPa", wave: "",
+      v: { R5: 0.33, R10: 0.29, R15: 0.27, R20: 0.28, R5_R20: 0.04, R5_R15: 0.05, X5: -0.21, X10: -0.05, X15: 0.03, X20: 0.07, AX: 0.31, Fres: 12.4 } },
+    Resmon: { sex: "F", age: 52, height: 164, weight: 68, unit: "cmH2O", wave: "",
+      v: { R5: 3.6, R11: 3.2, R19: 2.9, R5_R19: 0.7, X5: -1.3, X11: -0.4, X19: 0.5, Z5: 3.9, AX: 5.8, Fres: 12.8,
+           R5_insp: 3.4, R5_exp: 3.8, R11_insp: 3.0, R11_exp: 3.4, R19_insp: 2.8, R19_exp: 3.0, R5_R19_insp: 0.6, R5_R19_exp: 0.8,
+           X5_insp: -1.2, X5_exp: -1.5, X11_insp: -0.3, X11_exp: -0.5, X19_insp: 0.5, X19_exp: 0.4, Z5_insp: 3.6, Z5_exp: 4.1,
+           AX_insp: 5.1, AX_exp: 6.6, Fres_insp: 12.1, Fres_exp: 13.6 } },
+    Tremoflo: { sex: "M", age: 9, height: 134, weight: 29, unit: "cmH2O", wave: "5-37",
+      v: { R5: 7.4, R11: 6.3, R19: 5.6, R5_R19: 1.8, X5: -2.9, X11: -1.1, X19: 0.4, AX: 22, Fres: 19,
+           R5_insp: 7.0, R5_exp: 7.8, X5_insp: -2.6, X5_exp: -3.2 } }
+  };
+
+  const $ = (id) => document.getElementById(id);
+  let reg = null;
+  const vals = {};           // measured values keyed by resolved row key (e.g. "R5", "X5_insp")
+  let showExtra = false;
+  let showNoEq = false;
+  let structKey = "";
+
+  // Formatting ------
+  const MINUS = "−";
+  const fmtSigned = (v, d) => (v === null || v === undefined || !isFinite(v)) ? "–" : (v < 0 ? MINUS : v > 0 ? "+" : "") + Math.abs(v).toFixed(d);
+  const fmt = (v, d) => (v === null || v === undefined || !isFinite(v)) ? "–" : (v < 0 ? MINUS : "") + Math.abs(v).toFixed(d);
+  const UNIT_LABEL = { kPa: "kPa", cmH2O: "cmH₂O", hPa: "hPa" };
+  function decimals(isFreq, unit) { return isFreq ? 1 : unit === "kPa" ? 3 : 2; }
+  function displayName(p) {
+    if (p === "Z5") return "|Z|5";
+    const w = p.match(/^(AX|Fres)_(5_37|7_41)$/);
+    if (w) return w[1] + " (" + w[2].replace("_", "-") + ")";
+    return p.replace(/_(R[0-9]+)/, "−$1");
+  }
+
+  // State readers ------
+  const radio = (name) => (document.querySelector('input[name="' + name + '"]:checked') || {}).value;
+  function num(id) { const v = parseFloat($(id).value); return isFinite(v) ? v : null; }
+  function readState() {
+    const device = radio("device");
+    const age = num("age");
+    const eqChoice = $("eqsel").value || "auto";
+    const defId = RefEq.defaultSetId(reg, device, age === null ? 40 : age);
+    const setId = eqChoice === "auto" ? defId : eqChoice;
+    return {
+      sex: radio("sex"), age: age, heightCm: num("height"), weight: num("weight"),
+      device: device, wave: device === "Tremoflo" ? $("wave").value : "", unit: radio("unit"),
+      within: radio("phase") === "within", eqChoice: eqChoice, defId: defId, setId: setId,
+      set: RefEq.getSet(reg, setId)
+    };
+  }
+
+  // Equation selector ------
+  function buildEqSelect() {
+    const sel = $("eqsel");
+    const keep = sel.value || "auto";
+    sel.innerHTML = "";
+    const auto = document.createElement("option");
+    auto.value = "auto";
+    sel.appendChild(auto);
+    const grp = document.createElement("optgroup");
+    grp.label = "Choose a set";
+    for (const s of reg.sets) {
+      const o = document.createElement("option");
+      o.value = s.id;
+      o.textContent = s.label + (PAPER1_ONLY.includes(s.id) ? " · Paper 1 reproduction only" : "") + " · " + shortDevice(s.device_derived);
+      grp.appendChild(o);
+    }
+    sel.appendChild(grp);
+    sel.value = keep;
+  }
+  function shortDevice(d) {
+    const s = (d || "").toLowerCase();
+    if (s.includes("jaeger")) return "Jaeger";
+    if (s.includes("resmon")) return "Resmon";
+    if (s.includes("tremoflo")) return "tremoflo";
+    return "any FOT";
+  }
+  function deviceMatches(set, device) {
+    const d = shortDevice(set.device_derived);
+    return d === "any FOT" || d.toLowerCase() === device.toLowerCase();
+  }
+  function setLabel(id) { return RefEq.getSet(reg, id).label; }
+
+  // Rows ------
+  function rowSpecs(st) {
+    const set = st.set;
+    const core = DEVICE_PARAMS[st.device];
+    const extra = DEVICE_EXTRA[st.device].filter((p) => set.parameters[p]);
+    const list = core.concat(showExtra ? extra : []);
+    const rows = [];
+    for (const p of list) {
+      const phases = ["whole"];
+      if (st.within && RefEq.hasWithinBreath(set)) phases.push("insp", "exp");
+      for (const ph of phases) {
+        const res = RefEq.resolveName(reg, set.id, p, ph === "whole" ? null : ph, st.wave);
+        if (ph !== "whole" && (res.missing || !res.name)) continue;
+        const key = ph === "whole" ? p : p + "_" + ph;
+        rows.push({ base: p, phase: ph, key: key, eq: res.name, mappedFrom: res.mapped_from, missing: !!res.missing, needsWave: res.name === null });
+      }
+    }
+    return { rows: rows, nExtra: extra.length };
+  }
+  function group(p) { return p.startsWith("X") ? "Reactance" : p.startsWith("R") ? "Resistance" : "Integrated and impedance"; }
+  function unitText(p, unit) {
+    if (p === "Fres") return "Hz";
+    const u = UNIT_LABEL[unit];
+    return p === "AX" ? u + "/L" : u + "·s/L";
+  }
+  function waveNote(st, p) {
+    if (st.device !== "Tremoflo" || !st.wave) return "";
+    if (st.wave === "7-41" && /^(R5|X5|R5_R19)$/.test(p)) return "5 Hz is measured with the 5-37 waveform";
+    if (st.wave === "5-37" && /^(R7|X7|R7_R19)$/.test(p)) return "7 Hz is measured with the 7-41 waveform";
+    return "";
+  }
+
+  function buildTable(st, spec) {
+    const tb = $("tbody");
+    tb.innerHTML = "";
+    let lastGroup = "";
+    let hidden = 0;
+    for (const r of spec.rows) {
+      const noEq = r.missing || r.needsWave;
+      if (noEq && !showNoEq && !r.needsWave) { hidden++; continue; }
+      const g = group(r.base);
+      if (g !== lastGroup) {
+        const tr = document.createElement("tr");
+        tr.className = "grp";
+        tr.innerHTML = '<td colspan="10">' + g + "</td>";
+        tb.appendChild(tr);
+        lastGroup = g;
+      }
+      const tr = document.createElement("tr");
+      tr.dataset.key = r.key;
+      tr.className = (r.phase !== "whole" ? "phase " : "") + (noEq ? "noeq" : "");
+      const nameHtml = r.phase === "whole"
+        ? displayName(r.base)
+        : '<span class="sub">' + (r.phase === "insp" ? "insp" : "exp") + "</span>";
+      const via = r.mappedFrom ? '<span class="via">scored with ' + displayName(r.eq.replace(/_(insp|exp)$/, "")) + " equation</span>" : "";
+      const id = "m_" + r.key;
+      tr.innerHTML =
+        '<td class="l pname">' + nameHtml + via + "</td>" +
+        '<td class="meas"><input type="number" step="any" inputmode="decimal" id="' + id + '" aria-label="Measured ' + displayName(r.base) + (r.phase !== "whole" ? " " + r.phase : "") + '"></td>' +
+        '<td class="unit">' + unitText(r.base, st.unit) + "</td>" +
+        '<td class="num c-pred">–</td><td class="num c-lln">–</td><td class="num c-uln">–</td>' +
+        '<td class="num zc c-z">–</td><td class="num c-pct">–</td>' +
+        '<td class="l c-strip"></td><td class="l c-flag"></td>';
+      tb.appendChild(tr);
+      const inp = tr.querySelector("input");
+      if (vals[r.key] !== undefined && vals[r.key] !== null) inp.value = vals[r.key];
+      inp.addEventListener("input", () => {
+        const v = parseFloat(inp.value);
+        vals[r.key] = isFinite(v) ? v : null;
+        update(false);
+      });
+    }
+    const bm = $("btnMore");
+    bm.hidden = spec.nExtra === 0;
+    bm.textContent = showExtra ? "Hide other frequencies" : "Show other frequencies in this set (" + spec.nExtra + ")";
+    const bn = $("btnNoEq");
+    bn.hidden = hidden === 0 && !showNoEq;
+    bn.textContent = showNoEq ? "Hide parameters without an equation" : "Show parameters without an equation (" + hidden + ")";
+  }
+
+  // Strip chart ------
+  const SW = 150, SH = 18, ZMAX = 4;
+  const sx = (z) => 6 + ((z + ZMAX) / (2 * ZMAX)) * (SW - 12);
+  function stripSvg(z, ab) {
+    let s = '<svg class="strip" width="' + SW + '" height="' + SH + '" viewBox="0 0 ' + SW + " " + SH + '" aria-hidden="true">';
+    s += '<rect class="band" x="' + sx(-1.645) + '" y="3" width="' + (sx(1.645) - sx(-1.645)) + '" height="' + (SH - 6) + '"></rect>';
+    s += '<line class="axis" x1="' + sx(-ZMAX) + '" x2="' + sx(ZMAX) + '" y1="' + SH / 2 + '" y2="' + SH / 2 + '"></line>';
+    s += '<line class="zero" x1="' + sx(0) + '" x2="' + sx(0) + '" y1="2" y2="' + (SH - 2) + '"></line>';
+    if (z !== null && isFinite(z)) {
+      const cls = "dot" + (ab ? " ab" : "");
+      if (z > ZMAX || z < -ZMAX) {
+        const x = z > 0 ? sx(ZMAX) : sx(-ZMAX), d = z > 0 ? 1 : -1, m = SH / 2;
+        s += '<path class="' + cls + '" d="M' + (x + 4 * d) + " " + m + " L" + (x - 3 * d) + " " + (m - 5) + " L" + (x - 3 * d) + " " + (m + 5) + ' Z"></path>';
+      } else {
+        s += '<circle class="' + cls + '" cx="' + sx(z) + '" cy="' + SH / 2 + '" r="4.5"></circle>';
+      }
+    }
+    return s + "</svg>";
+  }
+  function stripHeader() {
+    let s = '<svg class="strip" width="' + SW + '" height="14" viewBox="0 0 ' + SW + ' 14" role="img" aria-label="z-score axis from minus 4 to plus 4">';
+    for (const t of [-4, -2, 0, 2, 4]) {
+      s += '<text x="' + sx(t) + '" y="11" text-anchor="middle">' + (t < 0 ? MINUS + Math.abs(t) : t > 0 ? "+" + t : "0") + "</text>";
+    }
+    return s + "</svg>";
+  }
+
+  // Scoring pass ------
+  function fillRows(st) {
+    const hM = st.heightCm === null ? null : st.heightCm / 100;
+    const k = reg.unit_factors_to_kPa[st.unit];
+    let nScored = 0, nAb = 0;
+    for (const tr of $("tbody").querySelectorAll("tr[data-key]")) {
+      const key = tr.dataset.key;
+      const base = key.replace(/_(insp|exp)$/, "");
+      const phase = key === base ? null : key.slice(base.length + 1);
+      const res = RefEq.resolveName(reg, st.setId, base, phase, st.wave);
+      const cells = (c) => tr.querySelector(".c-" + c);
+      const isFreq = base === "Fres";
+      const dp = decimals(isFreq, st.unit);
+      let out = null, why = "";
+      if (!res.name) why = "Select the tremoflo waveform to score " + displayName(base);
+      else if (res.missing) why = "No equation in this set";
+      else if (!st.sex || st.age === null || hM === null) why = "Enter age and height";
+      else {
+        try {
+          out = RefEq.score(reg, st.setId, res.name, {
+            sex: st.sex, age: st.age, height_m: hM, weight_kg: st.weight,
+            measured: vals[key] === undefined ? null : vals[key], unit: st.unit
+          });
+        } catch (e) { why = e.message; }
+        if (out && out.pred_kpa === null) {
+          why = out.reason === "no equation for this sex or age" ? "No equation for this sex or age in this set"
+            : out.reason === "weight needed for this equation" ? "Enter weight" : (out.reason || "");
+        }
+        if (out && out.pred_kpa !== null && out.z === null && out.reason) why = "Measured value is outside this equation's domain; no z";
+        const wn = waveNote(st, base);
+        if (wn && !why) why = wn;
+      }
+      const conv = (v) => (v === null || isFreq ? v : v / k);
+      cells("pred").textContent = out ? fmt(conv(out.pred_kpa), dp) : "–";
+      cells("lln").textContent = out ? fmt(conv(out.lln_kpa), dp) : "–";
+      cells("uln").textContent = out ? fmt(conv(out.uln_kpa), dp) : "–";
+      const z = out ? out.z : null;
+      const ab = out ? out.abnormal === true : false;
+      cells("z").textContent = fmtSigned(z, 2);
+      cells("z").classList.toggle("ab", ab);
+      cells("pct").textContent = out && out.pct_pred !== null ? Math.round(out.pct_pred) + "%" : "–";
+      cells("strip").innerHTML = out && out.pred_kpa !== null ? stripSvg(z, ab) : "";
+      const flag = cells("flag");
+      if (z !== null) {
+        nScored++;
+        if (ab) nAb++;
+        flag.innerHTML = ab
+          ? '<span class="flag ab">' + (RefEq.isAbnormalLow(reg, base) ? "Below LLN" : "Above ULN") + "</span>"
+          : '<span class="flag ok">Within limits</span>';
+        if (why) flag.innerHTML += '<div class="why">' + why + "</div>";
+      } else {
+        flag.innerHTML = why ? '<div class="why">' + why + "</div>" : "";
+      }
+    }
+    return { nScored: nScored, nAb: nAb };
+  }
+
+  // Alerts and equation card ------
+  function rangeText(set, sex) {
+    const v = set.valid && set.valid[sex] ? set.valid[sex] : set.valid || {};
+    const parts = [];
+    if (v.age) parts.push("age " + v.age[0] + "–" + v.age[1] + " y");
+    if (v.height_m) parts.push("height " + Math.round(v.height_m[0] * 100) + "–" + Math.round(v.height_m[1] * 100) + " cm");
+    if (v.height_cm) parts.push("height " + v.height_cm[0] + "–" + v.height_cm[1] + " cm");
+    if (v.bmi_max !== undefined) parts.push("BMI ≤ " + v.bmi_max);
+    return parts.join(", ");
+  }
+  function renderAlerts(st) {
+    const box = $("alerts");
+    const a = [];
+    const hM = st.heightCm === null ? null : st.heightCm / 100;
+    if (st.heightCm !== null && st.heightCm < 3) {
+      a.push('<div class="alert"><b>Height looks like metres.</b> Enter height in centimetres (for example 175, not 1.75).</div>');
+    }
+    if (st.sex && st.age !== null && hM !== null && hM <= 3) {
+      const rc = RefEq.rangeCheck(st.set, st.sex, st.age, hM, st.weight);
+      if (!rc.in_range) {
+        const what = rc.issues.map((i) => {
+          const val = i.what === "BMI" ? i.value.toFixed(1) : i.what === "height" ? i.value.toFixed(0) + " cm" : i.value + " y";
+          return i.what + " " + val;
+        }).join(", ");
+        a.push('<div class="alert"><b>Outside the ' + st.set.label + " derivation range:</b> " + what +
+          ". Valid for " + (st.set.valid[st.sex] ? (st.sex === "M" ? "males" : "females") + ": " : "") + rangeText(st.set, st.sex) +
+          ". Predicted values are extrapolated.</div>");
+      }
+    }
+    if (st.weight === null && usesWeight(st.set)) {
+      a.push('<div class="alert"><b>Weight needed.</b> ' + st.set.label + " uses weight or BMI; predictions stay blank until weight is entered.</div>");
+    }
+    if (!deviceMatches(st.set, st.device)) {
+      a.push('<div class="alert"><b>Different device.</b> ' + st.set.label + " was derived on " + st.set.device_derived +
+        "; you are applying it to " + (st.device === "Tremoflo" ? "tremoflo" : st.device) + " data. Between-device offsets are not corrected.</div>");
+    }
+    if (PAPER1_ONLY.includes(st.setId)) {
+      a.push('<div class="alert"><b>Paper 1 reproduction only.</b> ' + st.set.label + " is kept to reproduce the published pediatric comparison and is not used going forward.</div>");
+    }
+    if (st.device === "Tremoflo" && !st.wave && (st.set.mode_params || []).length) {
+      a.push('<div class="alert"><b>Waveform not set.</b> ' + st.set.label + " AX and Fres equations are waveform specific; choose AOS 5-37 or 7-41 to score them.</div>");
+    }
+    box.innerHTML = a.join("");
+  }
+  function usesWeight(set) {
+    const s = JSON.stringify(set.parameters);
+    return /"(weight|bmi|inv_bmi|ln_bmi)"/.test(s);
+  }
+  function renderEqCard(st) {
+    const s = st.set;
+    const link = (doi) => '<a href="https://doi.org/' + doi + '" target="_blank" rel="noopener noreferrer">doi:' + doi + "</a>";
+    const pm = (id) => '<a href="https://pubmed.ncbi.nlm.nih.gov/' + id + '/" target="_blank" rel="noopener noreferrer">PMID ' + id + "</a>";
+    const within = RefEq.hasWithinBreath(s);
+    let ranges = "";
+    if (s.valid.M || s.valid.F) {
+      ranges = ["M", "F"].filter((x) => s.valid[x]).map((x) => (x === "M" ? "Male: " : "Female: ") + rangeText(s, x)).join("<br>");
+    } else ranges = rangeText(s, "M");
+    const left =
+      "<div><h3>" + s.label + (st.eqChoice === "auto" ? ' <span class="tag def">Default</span>' : "") +
+      (PAPER1_ONLY.includes(s.id) ? ' <span class="tag p1">Paper 1 reproduction only</span>' : "") + "</h3>" +
+      "<p>" + s.citation + ". " + link(s.doi) + (s.pmid ? " · " + pm(s.pmid) : "") +
+      (s.correction_doi ? "<br>Correction: " + link(s.correction_doi) + (s.correction_pmid ? " · " + pm(s.correction_pmid) : "") : "") + "</p>" +
+      "<dl>" +
+      "<dt>Device</dt><dd>" + s.device_derived + "</dd>" +
+      "<dt>Population</dt><dd>" + s.population + "</dd>" +
+      "<dt>Valid range</dt><dd>" + ranges + "</dd>" +
+      "<dt>Native units</dt><dd>" + UNIT_LABEL[s.units] + "</dd>" +
+      "<dt>Source</dt><dd>" + s.source_table + "</dd>" +
+      "<dt>Within-breath</dt><dd>" + (within ? "Yes" : "No") + "</dd>" +
+      "<dt>Parameters</dt><dd>" + [...new Set(Object.keys(s.parameters).map((k) => k.replace(/_(insp|exp)$/, "")))].map(displayName).join(", ") + (within ? " (whole breath; insp and exp where published)" : "") + "</dd>" +
+      "</dl></div>";
+    const right = "<div><h2>Notes</h2><ul>" + (s.notes || []).map((n) => "<li>" + escapeHtml(n) + "</li>").join("") + "</ul></div>";
+    $("eqcard").innerHTML = left + right;
+  }
+  function escapeHtml(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+  // Main update ------
+  function update(structural) {
+    if (!reg) return;
+    const st = readState();
+    $("waveField").hidden = st.device !== "Tremoflo";
+    const bmi = st.weight !== null && st.heightCm ? st.weight / Math.pow(st.heightCm / 100, 2) : null;
+    $("bmi").textContent = bmi ? bmi.toFixed(1) : "–";
+
+    const ageGroup = st.age !== null && st.age < RefEq.CHILD_AGE_LIMIT ? "child" : "adult";
+    $("eqsel").options[0].textContent = "Default for " + (st.device === "Tremoflo" ? "tremoflo" : st.device) + ", " + ageGroup + ": " + setLabel(st.defId);
+    $("eqhint").textContent = "Default by device and age (child under " + RefEq.CHILD_AGE_LIMIT + " y).";
+
+    const hasWB = RefEq.hasWithinBreath(st.set);
+    $("phB").disabled = !hasWB;
+    if (!hasWB && st.within) { $("phW").checked = true; st.within = false; }
+    $("phasehint").textContent = hasWB ? "Adds inspiratory and expiratory rows where the set has them." : st.set.label + " has no within-breath equations.";
+
+    const spec = rowSpecs(st);
+    const key = [st.setId, st.device, st.wave, st.within, st.unit, showExtra, showNoEq, spec.rows.map((r) => r.key + ":" + r.eq).join(",")].join("|");
+    if (structural || key !== structKey) { buildTable(st, spec); structKey = key; }
+    const tally = fillRows(st);
+    $("resmeta").innerHTML = "<b>" + st.set.label + "</b> · " + tally.nScored + " scored" + (tally.nScored ? " · " + tally.nAb + " outside limits" : "");
+    renderAlerts(st);
+    renderEqCard(st);
+  }
+
+  // Examples ------
+  function loadExample() {
+    const dev = radio("device");
+    const ex = EXAMPLES[dev];
+    $("sex" + ex.sex).checked = true;
+    $("age").value = ex.age;
+    $("height").value = ex.height;
+    $("weight").value = ex.weight;
+    document.querySelector('input[name="unit"][value="' + ex.unit + '"]').checked = true;
+    $("wave").value = ex.wave;
+    $("eqsel").value = "auto";
+    for (const k of Object.keys(vals)) delete vals[k];
+    Object.assign(vals, ex.v);
+    $("exampleNote").textContent = "Example values, not a real subject.";
+    update(true);
+  }
+  function clearAll() {
+    for (const k of Object.keys(vals)) delete vals[k];
+    $("age").value = ""; $("height").value = ""; $("weight").value = "";
+    $("exampleNote").textContent = "";
+    update(true);
+  }
+
+  // Wiring ------
+  function wire() {
+    for (const id of ["age", "height", "weight"]) $(id).addEventListener("input", () => { $("exampleNote").textContent = ""; update(false); });
+    for (const el of document.querySelectorAll('input[name="sex"], input[name="phase"], input[name="unit"]')) el.addEventListener("change", () => update(false));
+    for (const el of document.querySelectorAll('input[name="device"]')) el.addEventListener("change", () => {
+      const u = DEVICE_UNIT[radio("device")];
+      document.querySelector('input[name="unit"][value="' + u + '"]').checked = true;
+      update(true);
+    });
+    $("wave").addEventListener("change", () => update(false));
+    $("eqsel").addEventListener("change", () => update(false));
+    $("btnMore").addEventListener("click", () => { showExtra = !showExtra; update(true); });
+    $("btnNoEq").addEventListener("click", () => { showNoEq = !showNoEq; update(true); });
+    $("btnExample").addEventListener("click", loadExample);
+    $("btnClear").addEventListener("click", clearAll);
+    $("form").addEventListener("submit", (e) => e.preventDefault());
+  }
+
+  function renderFooter() {
+    $("cites").innerHTML = reg.sets.map((s) =>
+      "<li>" + escapeHtml(s.citation) + '. <a href="https://doi.org/' + s.doi + '" target="_blank" rel="noopener noreferrer">doi:' + s.doi + "</a>" +
+      (s.correction_doi ? '; correction <a href="https://doi.org/' + s.correction_doi + '" target="_blank" rel="noopener noreferrer">doi:' + s.correction_doi + "</a>" : "") +
+      (PAPER1_ONLY.includes(s.id) ? " (Paper 1 reproduction only)" : "") + "</li>").join("");
+    $("buildline").textContent = "Coefficients: coefficients.json, built " + reg.built + " (schema " + reg.schema_version + "). " +
+      "Scoring engine js/refeq.js is tested against the golden reference cases before each release.";
+  }
+
+  $("stripHead").innerHTML = stripHeader();
+  fetch("coefficients.json", { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then((json) => {
+      reg = json;
+      buildEqSelect();
+      renderFooter();
+      wire();
+      loadExample();
+    })
+    .catch((e) => {
+      const el = $("loadError");
+      el.hidden = false;
+      el.textContent = "Could not load coefficients.json (" + e.message + "). If you opened index.html directly from disk, serve the folder instead, for example: python3 -m http.server, then open http://localhost:8000.";
+    });
+})();
+</script>
+</body>
+</html>

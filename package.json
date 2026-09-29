@@ -1,0 +1,10 @@
+{
+  "name": "oscillometry-reference",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static oscillometry reference-equation calculator (research use only)",
+  "scripts": {
+    "test": "node tests/run_golden.js && node tests/run_checks.js",
+    "serve": "python3 -m http.server 8000"
+  }
+}

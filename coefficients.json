@@ -1,0 +1,808 @@
+{
+  "schema_version": 2,
+  "built": "2026-09-29",
+  "z_convention": "positive z = measured above predicted, for every parameter and equation",
+  "lln_z": -1.645,
+  "uln_z": 1.645,
+  "abnormal_rule": "parameters whose name starts with X are abnormal when z < lln_z; all others when z > uln_z",
+  "abnormal_low_prefix": "X",
+  "unit_factors_to_kPa": {"kPa": 1.0, "hPa": 0.1, "cmH2O": 0.0980665},
+  "frequency_map": {
+    "note": "Used only when the chosen set has no row at the device's native frequency: Resmon/Tremoflo R11, R19, X11, R5-R19 are then scored with the 10 and 20 Hz rows of Berger, Oostveen, GR, Nowowiejska or Wu. Ducharme and Valach have native 11/19 Hz rows and are never mapped.",
+    "R11": "R10",
+    "R19": "R20",
+    "X11": "X10",
+    "R5_R19": "R5_R20"
+  },
+  "device_defaults": {
+    "note": "Primary equation by device and age group. Adults and Jaeger children agreed 2026-09-29 (Alex): Berger (Jaeger) and Oostveen (Resmon, Tremoflo) for adults, Gochicoa-Rangel for children. Resmon/Tremoflo children set to the device-matched Ducharme 2022 equations PENDING Alex's sign-off. Valach 2026 (Resmon, adults) available as a sensitivity set. Nowowiejska and Wu kept only to reproduce Paper 1.",
+    "Jaeger": {"adult": "berger2021", "child": "gochicoa2023"},
+    "Resmon": {"adult": "oostveen2013", "child": "ducharme2022_resmon"},
+    "Tremoflo": {"adult": "oostveen2013", "child": "ducharme2022_tremoflo"}
+  },
+  "sets": [
+    {
+      "id": "berger2021",
+      "label": "Berger 2021",
+      "citation": "Berger KI et al. ERJ Open Res 2021;7:00560-2020",
+      "doi": "10.1183/23120541.00560-2020",
+      "pmid": "33816605",
+      "source_table": "Table 4",
+      "device_derived": "Jaeger MasterScreen IOS",
+      "population": "472 healthy never-smoking adults, lower Manhattan (WTC control cohort)",
+      "units": "cmH2O",
+      "valid": {
+        "age": [21, 85],
+        "height_m": [1.46, 2.03],
+        "M": {"age": [21, 85], "height_m": [1.57, 2.03]},
+        "F": {"age": [21, 76], "height_m": [1.46, 1.83]}
+      },
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 2.07069, "height_m": -1.05124, "bmi": 0.03337}, "rsd": 0.24603},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 2.22395, "height_m": -0.98351, "bmi": 0.02903}, "rsd": 0.24652}
+        ]},
+        "R10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 2.00342, "height_m": -1.02184, "bmi": 0.03219}, "rsd": 0.24212},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 2.1542, "height_m": -0.95864, "bmi": 0.02737}, "rsd": 0.24568}
+        ]},
+        "R15": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 1.92723, "height_m": -0.91154, "bmi": 0.02674}, "rsd": 0.23324},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 2.05048, "height_m": -0.85489, "bmi": 0.02451}, "rsd": 0.23813}
+        ]},
+        "R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 1.9557, "height_m": -0.81148, "bmi": 0.02042}, "rsd": 0.223},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 2.01077, "height_m": -0.72768, "bmi": 0.02009}, "rsd": 0.22939}
+        ]},
+        "R5_R15": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log_plus", "terms": {"intercept": 0.51755, "height_m": -0.51198, "bmi": 0.02192}, "rsd": 0.19274, "c": 1},
+          {"type": "linear", "sex": "F", "transform": "log_plus", "terms": {"intercept": 0.5934, "height_m": -0.53125, "bmi": 0.02103}, "rsd": 0.1946, "c": 1}
+        ]},
+        "R5_R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log_plus", "terms": {"intercept": 0.37755, "height_m": -0.70125, "bmi": 0.03588}, "rsd": 0.28254, "c": 1},
+          {"type": "linear", "sex": "F", "transform": "log_plus", "terms": {"intercept": 0.59582, "height_m": -0.91438, "bmi": 0.03737}, "rsd": 0.36151, "c": 1}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log_plus", "terms": {"intercept": 0.10509, "height_m": 0.82626, "bmi": -0.01775}, "rsd": 0.241371, "c": 4},
+          {"type": "linear", "sex": "F", "transform": "log_plus", "terms": {"intercept": 0.29066, "height_m": 0.73387, "bmi": -0.01984}, "rsd": 0.17914, "c": 4}
+        ]},
+        "X10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log_plus", "terms": {"intercept": 1.14127, "height_m": 0.2983, "bmi": -0.01128}, "rsd": 0.121614, "c": 4},
+          {"type": "linear", "sex": "F", "transform": "log_plus", "terms": {"intercept": 1.07282, "height_m": 0.3405, "bmi": -0.0108}, "rsd": 0.0994, "c": 4}
+        ]},
+        "AX": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 4.36142, "height_m": -3.4745, "bmi": 0.08784}, "rsd": 0.687626},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 4.67153, "height_m": -3.31633, "bmi": 0.06719}, "rsd": 0.69309}
+        ]},
+        "Fres": {"class": "frequency", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 2.72388, "height_m": -0.69422, "bmi": 0.03115}, "rsd": 0.251555},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 3.3033, "height_m": -0.95364, "bmi": 0.0252}, "rsd": 0.26591}
+        ]}
+      },
+      "notes": [
+        "Earlier pipelines used the R5-15 row for R5-R20 and ln(4 - X) for X5/X10; both corrected here.",
+        "Valid ranges are the sex-specific age and height ranges of the derivation sample (Table 2)."
+      ]
+    },
+    {
+      "id": "oostveen2013",
+      "label": "Oostveen 2013",
+      "citation": "Oostveen E et al. Eur Respir J 2013;42:1513-23",
+      "doi": "10.1183/09031936.00126212",
+      "pmid": "23598954",
+      "source_table": "Tables 3 and 4",
+      "device_derived": "Five FOT set-ups (not device specific)",
+      "population": "368 healthy Caucasian adults, 5 European centres",
+      "units": "hPa",
+      "valid": {
+        "age": [18, 84],
+        "height_m": [1.47, 1.97],
+        "M": {"age": [18, 84], "height_m": [1.59, 1.97]},
+        "F": {"age": [19, 81], "height_m": [1.47, 1.88]}
+      },
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 5.327, "height_m": -3.032, "age": -0.00381, "weight": 0.0139}, "rsd": 0.2803},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 2.591, "height_m": -1.461, "age": 0.00279, "weight": 0.01221}, "rsd": 0.2657}
+        ]},
+        "R10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 4.964, "height_m": -2.794, "age": -0.00347, "weight": 0.01251}, "rsd": 0.2746},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 2.572, "height_m": -1.441, "age": 0.00248, "weight": 0.01123}, "rsd": 0.2672}
+        ]},
+        "R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 3.54, "height_m": -1.824, "age": -0.0033, "weight": 0.00888}, "rsd": 0.2638},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 2.482, "height_m": -1.122, "age": 0.00135, "weight": 0.00695}, "rsd": 0.2467}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log_c_minus", "terms": {"intercept": 2.683, "height_m": -0.703, "age": 0.0, "weight": 0.0019}, "rsd": 0.0728, "c": 4},
+          {"type": "linear", "sex": "F", "transform": "log_c_minus", "terms": {"intercept": 2.373, "height_m": -0.607, "age": 0.0015, "weight": 0.00312}, "rsd": 0.0814, "c": 4}
+        ]},
+        "X10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log_c_minus", "terms": {"intercept": 2.207, "height_m": -0.561, "age": 0.0, "weight": 0.00244}, "rsd": 0.068, "c": 4},
+          {"type": "linear", "sex": "F", "transform": "log_c_minus", "terms": {"intercept": 1.79, "height_m": -0.392, "age": 0.00134, "weight": 0.00328}, "rsd": 0.087, "c": 4}
+        ]},
+        "AX": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 9.73, "height_m": -6.107, "age": 0.0, "weight": 0.02122}, "rsd": 0.7266},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 5.49, "height_m": -4.122, "age": 0.0096, "weight": 0.02836}, "rsd": 0.6942}
+        ]},
+        "Fres": {"class": "frequency", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 5.07, "height_m": -1.904, "age": 0.0, "weight": 0.00864}, "rsd": 0.2498},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 3.415, "height_m": -1.104, "age": 0.00354, "weight": 0.01001}, "rsd": 0.2549}
+        ]}
+      },
+      "notes": [
+        "Units are hPa (1 hPa = 0.1 kPa = 1.0197 cmH2O); older pipelines treated them as cmH2O (about 0.07 SD shift for Rrs).",
+        "Resmon and Tremoflo measure 11 and 19 Hz; the 10 and 20 Hz rows are applied to them (frequency_map).",
+        "No published R5-R20 equation; z-scores for R5-R19 are not produced from this set.",
+        "Male valid height 1.59-1.97 m, age 18-84; female 1.47-1.88 m, age 19-81."
+      ]
+    },
+    {
+      "id": "gochicoa2023",
+      "label": "Gochicoa-Rangel 2023",
+      "citation": "Gochicoa-Rangel L et al. ERJ Open Res 2023;9:00503-2023",
+      "doi": "10.1183/23120541.00503-2023",
+      "pmid": null,
+      "source_table": "Tables 2 and 3; supplementary workbook",
+      "device_derived": "Jaeger MasterScreen IOS",
+      "population": "830 healthy Mexican subjects aged 2.7-90 years",
+      "units": "kPa",
+      "valid": {"age": [2.7, 90]},
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.446389, "sex_male": -0.015418, "age": -0.054965, "inv_height_cm": 100.379581, "inv_bmi": -2.606237}, "rsd": 0.143, "age_from": 2.7, "age_to": 7.37},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.2235, "sex_male": -0.015418, "age": -0.024709, "inv_height_cm": 100.379581, "inv_bmi": -2.606237}, "rsd": 0.104, "age_from": 7.37, "age_to": 19.11},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.28559, "sex_male": -0.015418, "age": 0.0019316, "inv_height_cm": 100.379581, "inv_bmi": -2.606237}, "rsd": 0.0724, "age_from": 19.11, "age_to": 90.0001}
+        ]},
+        "R10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.50774, "sex_male": -0.009279, "age": -0.055993, "inv_height_cm": 75.927159, "inv_bmi": -2.077629}, "rsd": 0.1194089, "age_from": 2.7, "age_to": 7.42},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.25469, "sex_male": -0.009279, "age": -0.021886, "inv_height_cm": 75.927159, "inv_bmi": -2.077629}, "rsd": 0.08344332, "age_from": 7.42, "age_to": 18.42},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.17295, "sex_male": -0.009279, "age": 0.0013355, "inv_height_cm": 75.927159, "inv_bmi": -2.077629}, "rsd": 0.06282849, "age_from": 18.42, "age_to": 90.0001}
+        ]},
+        "R15": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.47706, "sex_male": -0.014106, "age": -0.052626, "inv_height_cm": 64.43336, "inv_bmi": -1.230043}, "rsd": 0.1114599, "age_from": 2.7, "age_to": 7.55},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.21664, "sex_male": -0.014106, "age": -0.018149, "inv_height_cm": 64.43336, "inv_bmi": -1.230043}, "rsd": 0.07949125, "age_from": 7.55, "age_to": 18.79},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.14633, "sex_male": -0.014106, "age": 0.0011729, "inv_height_cm": 64.43336, "inv_bmi": -1.230043}, "rsd": 0.06028402, "age_from": 18.79, "age_to": 90.0001}
+        ]},
+        "R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.467775, "sex_male": -0.02099, "age": -0.048658, "inv_height_cm": 54.515578, "inv_bmi": -0.801186}, "rsd": 0.11, "age_from": 2.7, "age_to": 7.66},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.21954, "sex_male": -0.02099, "age": -0.016263, "inv_height_cm": 54.515578, "inv_bmi": -0.801186}, "rsd": 0.0785, "age_from": 7.66, "age_to": 17.86},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.091009, "sex_male": -0.02099, "age": 0.0011237, "inv_height_cm": 54.515578, "inv_bmi": -0.801186}, "rsd": 0.0566, "age_from": 17.86, "age_to": 90.0001}
+        ]},
+        "R5_R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.013349, "sex_male": 0.004813, "age": -0.0075403, "inv_height_cm": 43.014247, "inv_bmi": -1.794838}, "rsd": 0.0739, "age_from": 2.7, "age_to": 23.56},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.18775, "sex_male": 0.004813, "age": 0.00099579, "inv_height_cm": 43.014247, "inv_bmi": -1.794838}, "rsd": 0.0348, "age_from": 23.56, "age_to": 90.0001}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.089509, "sex_male": 0.009133, "age": 0.043369, "inv_height_cm": -57.924822, "inv_bmi": 1.090394}, "rsd": 0.0922, "age_from": 2.7, "age_to": 5.3},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.1172, "sex_male": 0.009133, "age": 0.0043487, "inv_height_cm": -57.924822, "inv_bmi": 1.090394}, "rsd": 0.0575, "age_from": 5.3, "age_to": 18.69},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.19728, "sex_male": 0.009133, "age": 6.377e-05, "inv_height_cm": -57.924822, "inv_bmi": 1.090394}, "rsd": 0.0408, "age_from": 18.69, "age_to": 90.0001}
+        ]},
+        "X10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.074644, "sex_male": 0.00594, "age": 0.032878, "inv_height_cm": -37.396994, "inv_bmi": 1.298675}, "rsd": 0.08269942, "age_from": 2.7, "age_to": 4.8},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.062574, "sex_male": 0.00594, "age": 0.0042905, "inv_height_cm": -37.396994, "inv_bmi": 1.298675}, "rsd": 0.0450797, "age_from": 4.8, "age_to": 17.78},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.14548, "sex_male": 0.00594, "age": -0.00037304, "inv_height_cm": -37.396994, "inv_bmi": 1.298675}, "rsd": 0.03146344, "age_from": 17.78, "age_to": 90.0001}
+        ]},
+        "X15": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": -0.048396, "sex_male": -0.003995, "age": 0.035226, "inv_height_cm": -34.912858, "inv_bmi": 1.229632}, "rsd": 0.08089067, "age_from": 2.7, "age_to": 4.7},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.099266, "sex_male": -0.003995, "age": 0.0038081, "inv_height_cm": -34.912858, "inv_bmi": 1.229632}, "rsd": 0.04453968, "age_from": 4.7, "age_to": 18.14},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.17472, "sex_male": -0.003995, "age": -0.00035174, "inv_height_cm": -34.912858, "inv_bmi": 1.229632}, "rsd": 0.0326824, "age_from": 18.14, "age_to": 90.0001}
+        ]},
+        "X20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.016911, "sex_male": -0.001806, "age": 0.024023, "inv_height_cm": -28.29, "inv_bmi": 1.01}, "rsd": 0.0544, "age_from": 2.7, "age_to": 5.3},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.1347, "sex_male": -0.001806, "age": 0.0017869, "inv_height_cm": -28.29, "inv_bmi": 1.01}, "rsd": 0.0351, "age_from": 5.3, "age_to": 21.0},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 0.1774, "sex_male": -0.001806, "age": -0.0002462, "inv_height_cm": -28.29, "inv_bmi": 1.01}, "rsd": 0.0341, "age_from": 21.0, "age_to": 90.0001}
+        ]},
+        "AX": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "any", "transform": "log", "terms": {"intercept": -3.42268, "sex_male": -0.06776, "age": 0.10429, "inv_height_cm": 544.962, "inv_bmi": -18.97076}, "rsd": 0.366, "age_from": 2.7, "age_to": 6.99},
+          {"type": "linear", "sex": "any", "transform": "log", "terms": {"intercept": -2.367, "sex_male": -0.06776, "age": -0.046624, "inv_height_cm": 544.962, "inv_bmi": -18.97076}, "rsd": 0.461, "age_from": 6.99, "age_to": 23.22},
+          {"type": "linear", "sex": "any", "transform": "log", "terms": {"intercept": -3.597, "sex_male": -0.06776, "age": 0.0063497, "inv_height_cm": 544.962, "inv_bmi": -18.97076}, "rsd": 0.621, "age_from": 23.22, "age_to": 90.0001}
+        ]},
+        "Fres": {"class": "frequency", "models": [
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 3.63228, "sex_male": 0.07493, "age": 0.14349, "inv_height_cm": 2781.55206, "inv_bmi": -99.15807}, "rsd": 2.71, "age_from": 2.7, "age_to": 9.7},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 7.518, "sex_male": 0.07493, "age": -0.2571, "inv_height_cm": 2781.55206, "inv_bmi": -99.15807}, "rsd": 3.2, "age_from": 9.7, "age_to": 20.99},
+          {"type": "linear", "sex": "any", "transform": "identity", "terms": {"intercept": 1.2542, "sex_male": 0.07493, "age": 0.041179, "inv_height_cm": 2781.55206, "inv_bmi": -99.15807}, "rsd": 3.89, "age_from": 20.99, "age_to": 90.0001}
+        ]}
+      },
+      "notes": [
+        "Earlier code used closed intervals (e.g. 2.70-7.36, 7.37-19.10), so ages between them returned NA.",
+        "Sex coded male = 1 (signs consistent with lower R and AX in males); confirm against the Methods text."
+      ]
+    },
+    {
+      "id": "nowowiejska2008",
+      "label": "Nowowiejska 2008",
+      "citation": "Nowowiejska B et al. Pediatr Pulmonol 2008;43:1193-7; erratum 2020;55:254",
+      "doi": "10.1002/ppul.20926",
+      "pmid": null,
+      "source_table": "Table 2",
+      "device_derived": "Jaeger IOS",
+      "population": "626 healthy Polish children aged 3.1-18.9 years",
+      "units": "kPa",
+      "valid": {"age": [3.1, 18.9], "height_cm": [95, 193]},
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 1.855, "height_cm": -0.0171}, "rsd": 0.2305},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 1.784, "height_cm": -0.0167}, "rsd": 0.2085}
+        ]},
+        "R10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 1.765, "height_cm": -0.0177}, "rsd": 0.226},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 1.694, "height_cm": -0.0172}, "rsd": 0.207}
+        ]},
+        "R15": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 1.475, "height_cm": -0.0162}, "rsd": 0.2208},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 1.48, "height_cm": -0.016}, "rsd": 0.2006}
+        ]},
+        "R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 1.209, "height_cm": -0.0149}, "rsd": 0.2272},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 1.201, "height_cm": -0.0145}, "rsd": 0.2114}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": -0.699, "height_cm": 0.0035}, "rsd": 0.054},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": -0.762, "height_cm": 0.004}, "rsd": 0.0543}
+        ]},
+        "X10": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": -0.377, "height_cm": 0.0021}, "rsd": 0.0531},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": -0.383, "height_cm": 0.0023}, "rsd": 0.0532}
+        ]},
+        "X15": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": -0.317, "height_cm": 0.002}, "rsd": 0.0522},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": -0.33, "height_cm": 0.0022}, "rsd": 0.0524}
+        ]},
+        "X20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": -0.161, "height_cm": 0.0014}, "rsd": 0.0457},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": -0.199, "height_cm": 0.0017}, "rsd": 0.0476}
+        ]},
+        "Fres": {"class": "frequency", "models": [
+          {"type": "linear", "sex": "M", "transform": "log", "terms": {"intercept": 4.164, "height_cm": -0.0101}, "rsd": 0.2299},
+          {"type": "linear", "sex": "F", "transform": "log", "terms": {"intercept": 4.24, "height_cm": -0.0109}, "rsd": 0.2292}
+        ]}
+      },
+      "notes": [
+        "The paper writes z = (measured - predicted)/RSD, but for the exponential models the RSD (about 0.2) is on the log scale; z is computed on ln(y). This matches the published pediatric analysis."
+      ]
+    },
+    {
+      "id": "wu2022",
+      "label": "Wu 2022",
+      "citation": "Wu J et al. Respir Res 2022;23:182",
+      "doi": "10.1186/s12931-022-02080-z",
+      "pmid": null,
+      "source_table": "Table 4",
+      "device_derived": "Jaeger MasterScreen IOS",
+      "population": "6270 healthy Chinese children aged 4-17 years",
+      "units": "kPa",
+      "valid": {"age": [4, 17.99], "height_cm": [100, 180]},
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": 1.894, "height_cm": -0.007, "age": -0.028, "weight": 0.002}, "rsd": 0.264},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": 1.834, "height_cm": -0.008, "age": -0.019, "weight": 0.003}, "rsd": 0.176}
+        ]},
+        "R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": 1.087, "height_cm": -0.004, "age": -0.01, "weight": 0.001}, "rsd": 0.136},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": 0.964, "height_cm": -0.003, "age": -0.009, "weight": 0.0}, "rsd": 0.123}
+        ]},
+        "R5_R20": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": 0.703, "height_cm": -0.003, "age": -0.013, "weight": 0.001}, "rsd": 0.133},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": 0.787, "height_cm": -0.004, "age": -0.012, "weight": 0.002}, "rsd": 0.13}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": -0.554, "height_cm": 0.002, "age": 0.007, "weight": 0.0}, "rsd": 0.091},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": -0.563, "height_cm": 0.002, "age": 0.006, "weight": 0.0}, "rsd": 0.089}
+        ]},
+        "Fres": {"class": "frequency", "models": [
+          {"type": "linear", "sex": "M", "transform": "identity", "terms": {"intercept": 31.885, "height_cm": -0.094, "age": -0.257, "weight": 0.035}, "rsd": 3.615},
+          {"type": "linear", "sex": "F", "transform": "identity", "terms": {"intercept": 33.941, "height_cm": -0.104, "age": -0.303, "weight": 0.04}, "rsd": 4.027}
+        ]}
+      },
+      "notes": [
+        "Height coefficients rounded to 0.001 per cm: at 150 cm a rounding error of 0.0005 shifts the prediction by up to 0.075 kPa, about 0.3 SD for R5. Obtain Table S1 if it reports more digits."
+      ]
+    },
+    {
+      "id": "ducharme2022_resmon",
+      "label": "Ducharme 2022 (Resmon)",
+      "citation": "Ducharme FM et al. Pediatr Pulmonol 2022;57:2092-2102",
+      "doi": "10.1002/ppul.25984",
+      "pmid": "35578568",
+      "population": "306 healthy multiethnic Canadian children, Montreal",
+      "units": "kPa",
+      "valid": {"age": [3, 17.99], "height_cm": [100, 189]},
+      "source_table": "Table 2",
+      "device_derived": "Resmon Pro FULL (5-11-19 Hz and 8 Hz signals)",
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": -0.1509337, "height_cm": 0.0080947, "height_cm2": -8.24e-05}, "sigma_terms": {"intercept": 0.2686874, "height_cm": -0.0011421}}
+        ]},
+        "R5_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": -0.247646, "height_cm": 0.0081952, "height_cm2": -8.2e-05}, "sigma_terms": {"intercept": 0.2772698, "height_cm": -0.0012611}}
+        ]},
+        "R5_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": -0.0761429, "height_cm": 0.0079739, "height_cm2": -8.24e-05}, "sigma_terms": {"intercept": 0.2956035, "height_cm": -0.0012185}}
+        ]},
+        "R8": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.2079488, "height_cm": 0.002562, "height_cm2": -6.31e-05}, "sigma_terms": {"intercept": 0.2511093, "height_cm": -0.0010578}}
+        ]},
+        "R8_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.0060535, "height_cm": 0.0042775, "height_cm2": -6.86e-05}, "sigma_terms": {"intercept": 0.2496016, "height_cm": -0.0010845}}
+        ]},
+        "R8_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.3477524, "height_cm": 0.0014231, "height_cm2": -5.92e-05}, "sigma_terms": {"intercept": 0.2636199, "height_cm": -0.00107}}
+        ]},
+        "R11": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": -0.2085177, "height_cm": 0.0063845, "height_cm2": -7.2e-05}, "sigma_terms": {"intercept": 0.216114, "height_cm": -0.0008935}}
+        ]},
+        "R19": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.1562894, "height_cm": -0.0032993, "height_cm2": -2.89e-05}, "sigma_terms": {"intercept": 0.2308085, "height_cm": -0.0010078}}
+        ]},
+        "R5_R19": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": 0.5082932, "height_cm": -0.0028301}, "sigma_terms": {"intercept": 0.2117816, "height_cm": -0.0009223}}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.2117906, "height_cm": 0.010689, "height_cm2": -2.4e-05}, "sigma_terms": {"intercept": 0.2143459, "height_cm": -0.0010743}}
+        ]},
+        "X5_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.1369207, "height_cm": 0.0100999, "height_cm2": -2.26e-05}, "sigma_terms": {"intercept": 0.2119742, "height_cm": -0.0010513}}
+        ]},
+        "X5_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.3452124, "height_cm": 0.0122179, "height_cm2": -2.87e-05}, "sigma_terms": {"intercept": 0.2189837, "height_cm": -0.0010835}}
+        ]},
+        "X8": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.0176482, "height_cm": 0.0092642, "height_cm2": -2.08e-05}, "sigma_terms": {"intercept": 0.18383, "height_cm": -0.0008808}}
+        ]},
+        "X8_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.9129264, "height_cm": 0.0083601, "height_cm2": -1.85e-05}, "sigma_terms": {"intercept": 0.148398, "height_cm": -0.0007071}}
+        ]},
+        "X8_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.0718854, "height_cm": 0.0095736, "height_cm2": -2.12e-05}, "sigma_terms": {"intercept": 0.2258623, "height_cm": -0.0010783}}
+        ]},
+        "X11": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.7586734, "height_cm": 0.0064882, "height_cm2": -1.21e-05}, "sigma_terms": {"intercept": 0.1707068, "height_cm": -0.000765}}
+        ]},
+        "X19": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.4561191, "height_cm": 0.0038301, "height_cm2": -4.8e-06}, "sigma_terms": {"intercept": 0.0880278, "height_cm": -0.0002369}}
+        ]}
+      },
+      "notes": [
+        "Standing height only; age, weight and sex are not predictors (age is used only for the valid range).",
+        "R8 and X8 rows come from the 8 Hz single-frequency signal; all others from 5-11-19 Hz.",
+        "Rrs: mean on a log link, sigma in kPa (see build_coefficients.py for the Figure 3 check).",
+        "Sigma falls linearly with height; at 180 cm the X5 LLN sits only about 0.035 kPa below predicted. Interpret tall adolescents with care.",
+        "No AX or Fres equations for Resmon in this paper."
+      ]
+    },
+    {
+      "id": "ducharme2022_tremoflo",
+      "label": "Ducharme 2022 (tremoflo)",
+      "citation": "Ducharme FM et al. Pediatr Pulmonol 2022;57:2092-2102; correction Pediatr Pulmonol 2025;60:e27409",
+      "doi": "10.1002/ppul.25984",
+      "pmid": "35578568",
+      "population": "306 healthy multiethnic Canadian children, Montreal",
+      "units": "kPa",
+      "valid": {"age": [3, 17.99], "height_cm": [100, 189]},
+      "correction_doi": "10.1002/ppul.27409",
+      "correction_pmid": "39545634",
+      "source_table": "Table 3 v1.1 (correction, 10 April 2024)",
+      "device_derived": "tremoflo C-100 (AOS 5-37 Hz and 7-41 Hz waveforms)",
+      "mode_params": ["AX", "Fres"],
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": -0.0251772, "height_cm": 0.0080913, "height_cm2": -8.17e-05}, "sigma_terms": {"intercept": 0.3131217, "height_cm": -0.0013188}}
+        ]},
+        "R5_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.0670623, "height_cm": 0.0063859, "height_cm2": -7.66e-05}, "sigma_terms": {"intercept": 0.3059592, "height_cm": -0.0012916}}
+        ]},
+        "R5_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": -0.0648959, "height_cm": 0.0089816, "height_cm2": -8.43e-05}, "sigma_terms": {"intercept": 0.3202804, "height_cm": -0.0013243}}
+        ]},
+        "R7": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.2543053, "height_cm": 0.0030819, "height_cm2": -6.41e-05}, "sigma_terms": {"intercept": 0.2912107, "height_cm": -0.001222}}
+        ]},
+        "R7_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.3621406, "height_cm": 0.0011067, "height_cm2": -5.83e-05}, "sigma_terms": {"intercept": 0.2699468, "height_cm": -0.001121}}
+        ]},
+        "R7_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.2951137, "height_cm": 0.0029301, "height_cm2": -6.31e-05}, "sigma_terms": {"intercept": 0.3037904, "height_cm": -0.0012621}}
+        ]},
+        "R11": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.2009822, "height_cm": 0.0029808, "height_cm2": -6.27e-05}, "sigma_terms": {"intercept": 0.2708241, "height_cm": -0.0011672}}
+        ]},
+        "R13": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.2192711, "height_cm": 0.0014931, "height_cm2": -5.5e-05}, "sigma_terms": {"intercept": 0.2597823, "height_cm": -0.0011189}}
+        ]},
+        "R17": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.3071937, "height_cm": -0.0024154, "height_cm2": -3.6e-05}, "sigma_terms": {"intercept": 0.2638353, "height_cm": -0.0011427}}
+        ]},
+        "R19": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.4188948, "height_cm": -0.0049662, "height_cm2": -2.46e-05}, "sigma_terms": {"intercept": 0.2632939, "height_cm": -0.0011178}}
+        ]},
+        "R23": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.6248747, "height_cm": -0.0099643, "height_cm2": -4e-06}, "sigma_terms": {"intercept": 0.2224992, "height_cm": -0.0008983}}
+        ]},
+        "R29": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.6002373, "height_cm": -0.0096421, "height_cm2": -3.3e-06}, "sigma_terms": {"intercept": 0.1427123, "height_cm": -0.0004738}}
+        ]},
+        "R31": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.516936, "height_cm": -0.0081193, "height_cm2": -8.4e-06}, "sigma_terms": {"intercept": 0.1345234, "height_cm": -0.0004325}}
+        ]},
+        "R37": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.2610755, "height_cm": -0.0039721, "height_cm2": -2.37e-05}, "sigma_terms": {"intercept": 0.1258874, "height_cm": -0.000404}}
+        ]},
+        "R41": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "log", "transform": "identity", "mu_terms": {"intercept": 0.1954663, "height_cm": -0.0022855, "height_cm2": -3.14e-05}, "sigma_terms": {"intercept": 0.1462867, "height_cm": -0.0005101}}
+        ]},
+        "R5_R19": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": 0.582983, "height_cm": -0.0031635}, "sigma_terms": {"intercept": 0.2520296, "height_cm": -0.0011147}}
+        ]},
+        "R7_R19": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": 0.4262891, "height_cm": -0.0023731}, "sigma_terms": {"intercept": 0.2171609, "height_cm": -0.0009781}}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.1334595, "height_cm": 0.0084314, "height_cm2": -1.49e-05}, "sigma_terms": {"intercept": 0.2105421, "height_cm": -0.0009932}}
+        ]},
+        "X5_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.8765923, "height_cm": 0.0048176, "height_cm2": -2.9e-06}, "sigma_terms": {"intercept": 0.1967433, "height_cm": -0.000906}}
+        ]},
+        "X5_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.3816724, "height_cm": 0.0119662, "height_cm2": -2.68e-05}, "sigma_terms": {"intercept": 0.2211405, "height_cm": -0.0010339}}
+        ]},
+        "X7": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.0569168, "height_cm": 0.0087582, "height_cm2": -1.8e-05}, "sigma_terms": {"intercept": 0.1925305, "height_cm": -0.0009064}}
+        ]},
+        "X7_insp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.0112387, "height_cm": 0.0083018, "height_cm2": -1.67e-05}, "sigma_terms": {"intercept": 0.1903695, "height_cm": -0.0009062}}
+        ]},
+        "X7_exp": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -1.1674327, "height_cm": 0.0101665, "height_cm2": -2.25e-05}, "sigma_terms": {"intercept": 0.1989135, "height_cm": -0.0009205}}
+        ]},
+        "X11": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.867582, "height_cm": 0.0069436, "height_cm2": -1.22e-05}, "sigma_terms": {"intercept": 0.2131633, "height_cm": -0.0009929}}
+        ]},
+        "X13": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.884593, "height_cm": 0.0073038, "height_cm2": -1.32e-05}, "sigma_terms": {"intercept": 0.2018333, "height_cm": -0.0009113}}
+        ]},
+        "X17": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.6825942, "height_cm": 0.0054079, "height_cm2": -8e-06}, "sigma_terms": {"intercept": 0.15471, "height_cm": -0.0006261}}
+        ]},
+        "X19": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": -0.5619926, "height_cm": 0.0043343, "height_cm2": -5.4e-06}, "sigma_terms": {"intercept": 0.1441471, "height_cm": -0.0005661}}
+        ]},
+        "Fres_5_37": {"class": "frequency", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": 12.1902218, "height_cm": 0.3074905, "height_cm2": -0.0016839}, "sigma_terms": {"intercept": 3.5470232, "height_cm": 0.0081112}}
+        ]},
+        "Fres_7_41": {"class": "frequency", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "identity", "mu_terms": {"intercept": 12.3784859, "height_cm": 0.3312088, "height_cm2": -0.0017951}, "sigma_terms": {"intercept": 6.0342901, "height_cm": -0.0054659}}
+        ]},
+        "AX_5_37": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "sqrt", "mu_terms": {"intercept": 4.2293625, "height_cm": -0.0201357}, "sigma_terms": {"intercept": 0.378}}
+        ]},
+        "AX_7_41": {"class": "pressure", "models": [
+          {"type": "gamlss_normal", "sex": "any", "mu_link": "identity", "transform": "sqrt", "mu_terms": {"intercept": 4.0942645, "height_cm": -0.0202497}, "sigma_terms": {"intercept": 0.403}}
+        ]}
+      },
+      "notes": [
+        "AX and Fres are waveform specific: score as AX_5_37 / AX_7_41 and Fres_5_37 / Fres_7_41. refeq_score_long builds the name from the mode column and refuses to guess.",
+        "R and X at shared frequencies were averaged across the two waveforms by the authors; 5 Hz rows need the 5-37 waveform, 7 Hz rows the 7-41 waveform.",
+        "Mayo data dictionary: tremoflo waveform field is 'AOS 5-37 - Adult' or 'AOS 7-41 - Pediatric'.",
+        "AX: sqrt(AX) = a + b*Ht, constant SEE; LLN is floored at 0."
+      ]
+    },
+    {
+      "id": "valach2026",
+      "label": "Valach 2026 (LEAD)",
+      "citation": "Valach C et al. ERJ Open Res 2026;12:00159-2025",
+      "doi": "10.1183/23120541.00159-2025",
+      "pmid": "41497331",
+      "source_table": "Tables 2-5; supplementary Tables S1-S2 (11 and 19 Hz)",
+      "device_derived": "Resmon Pro FULL (5-11-19 Hz)",
+      "population": "887 healthy never-smoking adults, Austrian LEAD cohort (Vienna)",
+      "units": "cmH2O",
+      "valid": {"age": [18, 90], "bmi_max": 35},
+      "parameters": {
+        "R5": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 9.10454079, "ln_height_cm": -1.94365016, "ln_age": -0.13493079, "ln_bmi": 0.73359356},
+           "S_terms": {"intercept": 3.39897015, "ln_height_cm": -0.89954098, "ln_age": 0.18722026, "ln_bmi": -0.2363505},
+           "L_terms": {"intercept": 22.96212585, "ln_height_cm": -4.19150238, "ln_age": 0.23357827, "ln_bmi": -0.74956753}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.51176089, "height_cm": -0.00581226, "age": -0.00194815, "bmi": 0.02946239},
+           "S_terms": {"intercept": -1.62848204, "height_cm": -3.48e-05, "age": 0.00684834, "bmi": -0.00141105},
+           "L_terms": {"intercept": 0.04517853, "height_cm": -0.01529633, "age": 0.01618496, "bmi": 0.05140252}}
+        ]},
+        "R5_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 9.24177009, "ln_height_cm": -1.99864417, "ln_age": -0.1689901, "ln_bmi": 0.79544119},
+           "S_terms": {"intercept": 1.19147581, "ln_height_cm": -0.70747279, "ln_age": 0.19081495, "ln_bmi": 0.09865327},
+           "L_terms": {"intercept": 27.67130094, "ln_height_cm": -4.86097967, "ln_age": -0.24299068, "ln_bmi": -0.5397826}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.93046016, "height_cm": -0.00874381, "age": -0.0031738, "bmi": 0.03029548},
+           "S_terms": {"intercept": -0.92809932, "height_cm": -0.00417099, "age": 0.00894064, "bmi": -0.0094308},
+           "L_terms": {"intercept": 3.19797959, "height_cm": -0.03178605, "age": 0.01244907, "bmi": 0.03452399}}
+        ]},
+        "R5_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 9.06473578, "ln_height_cm": -1.93336155, "ln_age": -0.12427081, "ln_bmi": 0.73222905},
+           "S_terms": {"intercept": 2.82459485, "ln_height_cm": -0.72319302, "ln_age": 0.21503509, "ln_bmi": -0.34025983},
+           "L_terms": {"intercept": 18.30362429, "ln_height_cm": -3.57036141, "ln_age": 0.3320123, "ln_bmi": -0.44085452}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.36688181, "height_cm": -0.00461285, "age": -0.00143902, "bmi": 0.02872798},
+           "S_terms": {"intercept": -1.82009717, "height_cm": 0.00179638, "age": 0.00587782, "bmi": 7.433e-05},
+           "L_terms": {"intercept": -0.47095902, "height_cm": -0.00952288, "age": 0.01642581, "bmi": 0.0331916}}
+        ]},
+        "X5": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 1.0},
+           "M_terms": {"intercept": 9.4589637, "ln_height_cm": -1.71656853},
+           "S_terms": {"intercept": -0.31655849, "ln_height_cm": -0.29607484},
+           "L_terms": {"intercept": -48.35479093, "ln_height_cm": 9.04155502}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 1.0},
+           "M_terms": {"intercept": 2.15122728, "height_cm": -0.01007245, "age": 0.00253771, "bmi": 0.00522028},
+           "S_terms": {"intercept": -2.10352672, "height_cm": -0.00247685, "age": 0.0043698, "bmi": 0.02227286},
+           "L_terms": {"intercept": 1.60615653, "height_cm": -0.01674539, "age": 0.01796927, "bmi": -0.01506559}}
+        ]},
+        "X5_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 1.0},
+           "M_terms": {"intercept": 2.57505036, "height_cm": -0.0111004},
+           "S_terms": {"intercept": -0.53685865, "height_cm": -0.00800316},
+           "L_terms": {"intercept": 2.62372754, "height_cm": -0.02084386}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 1.0},
+           "M_terms": {"intercept": 2.39340186, "height_cm": -0.01121632, "age": 0.00199328, "bmi": 0.00584719},
+           "S_terms": {"intercept": -1.09103626, "height_cm": -0.00587069, "age": 0.0032296, "bmi": 0.00155945},
+           "L_terms": {"intercept": -1.07986523, "height_cm": 0.00556732, "age": 0.01382743, "bmi": -0.03799135}}
+        ]},
+        "X5_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 1.0},
+           "M_terms": {"intercept": 8.78486035, "ln_height_cm": -1.6006438, "age": 0.00081385},
+           "S_terms": {"intercept": -9.98000452, "ln_height_cm": 1.4370632, "age": 0.00382693, "bmi": 0.02498982},
+           "L_terms": {"intercept": -8.51393936, "ln_height_cm": 1.41586737, "age": -0.02737228, "bmi": 0.03942801}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 1.0},
+           "M_terms": {"intercept": 8.74561874, "ln_height_cm": -1.60571955, "age": 0.00292458},
+           "S_terms": {"intercept": -2.2148907, "height_cm": -0.0022109, "age": 0.00561666, "bmi": 0.02836417},
+           "L_terms": {"intercept": 4.28640439, "height_cm": -0.0321368, "age": 0.0164973, "bmi": -0.03044357}}
+        ]},
+        "Z5": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 10.3160128, "ln_height_cm": -2.1417401, "ln_age": -0.11677466, "ln_bmi": 0.67110564},
+           "S_terms": {"intercept": 2.09038572, "ln_height_cm": -0.74554664, "ln_age": 0.21755418, "ln_bmi": -0.11944957},
+           "L_terms": {"intercept": 18.58360151, "ln_height_cm": -3.75202028, "ln_age": 0.15669418, "ln_bmi": -0.03056656}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.9252465, "height_cm": -0.00712199, "ln_age": -0.04697892, "bmi": 0.02728427},
+           "S_terms": {"intercept": -2.73439469, "height_cm": 0.00098575, "ln_age": 0.3153847, "bmi": 0.00076457},
+           "L_terms": {"intercept": -2.24655766, "height_cm": -0.01341143, "ln_age": 0.76134901, "bmi": 0.04607785}}
+        ]},
+        "Z5_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 10.87442191, "ln_height_cm": -2.25656975, "ln_age": -0.14354049, "ln_bmi": 0.69551527},
+           "S_terms": {"intercept": -0.33943173, "ln_height_cm": -0.51975771, "ln_age": 0.21830233, "ln_bmi": 0.22169373},
+           "L_terms": {"intercept": 24.59131678, "ln_height_cm": -4.68177396, "ln_age": -0.31981737, "ln_bmi": 0.18350766}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 2.56140905, "height_cm": -0.01039418, "ln_age": -0.08973198, "bmi": 0.02677241},
+           "S_terms": {"intercept": -1.21454201, "height_cm": -0.0029709, "age": 0.00772026, "bmi": -0.00513483},
+           "L_terms": {"intercept": 3.58290279, "height_cm": -0.03363754, "age": 0.01072342, "bmi": 0.03673609}}
+        ]},
+        "Z5_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 10.11162548, "ln_height_cm": -2.11168937, "ln_age": -0.10782452, "ln_bmi": 0.68780222},
+           "S_terms": {"intercept": 1.70249152, "ln_height_cm": -0.60921852, "ln_age": 0.24069894, "ln_bmi": -0.20572612},
+           "L_terms": {"intercept": 17.30560353, "ln_height_cm": -3.66338497, "ln_age": 0.26125592, "ln_bmi": 0.08546784}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.67085149, "height_cm": -0.00571958, "ln_age": -0.02820341, "bmi": 0.02717586},
+           "S_terms": {"intercept": -2.81307598, "height_cm": 0.00251894, "ln_age": 0.29266849, "bmi": 0.00178568},
+           "L_terms": {"intercept": -3.06138079, "height_cm": -0.0067298, "ln_age": 0.80928249, "bmi": 0.02571568}}
+        ]},
+        "R5_R19": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": -1.3721439, "height_cm": -0.00586712, "age": 0.00177038, "ln_bmi": 0.75427942},
+           "S_terms": {"intercept": -2.86531006, "height_cm": 0.00053228, "age": 0.0006362, "ln_bmi": 0.39995355},
+           "L_terms": {"intercept": -11.698544, "height_cm": 0.01128016, "age": -0.00578114, "ln_bmi": 2.90274955}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 4.05610384, "ln_height_cm": -0.93500884, "age": 0.00248744, "bmi": 0.03065082},
+           "S_terms": {"intercept": -2.30689081, "height_cm": 0.0070757, "age": 0.00451554, "bmi": -0.0086037},
+           "L_terms": {"intercept": -1.17369673, "height_cm": 0.01839799, "age": -0.00613401, "bmi": -0.06146563}}
+        ]},
+        "R5_R19_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": -0.9159879, "height_cm": -0.00607449, "age": 0.00215364, "ln_bmi": 0.60485962},
+           "S_terms": {"intercept": -3.62658242, "height_cm": -0.00303474, "age": -0.00105984, "ln_bmi": 0.81089343},
+           "L_terms": {"intercept": -7.84561018, "height_cm": 0.01702177, "age": -0.01313114, "ln_bmi": 1.74212367}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 1.0061581, "height_cm": -0.00979036, "age": 0.001616, "bmi": 0.02611538},
+           "S_terms": {"intercept": -2.96928372, "height_cm": 0.0097181, "age": 0.00472876, "bmi": -0.00462909},
+           "L_terms": {"intercept": -4.29314858, "height_cm": 0.03536076, "age": -0.01753411, "bmi": -0.01844473}}
+        ]},
+        "R5_R19_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 3.93450937, "ln_height_cm": -0.91574599, "age": 0.00168258, "bmi": 0.03380638},
+           "S_terms": {"intercept": -3.8512333, "ln_height_cm": 0.40761119, "age": 0.00186567, "bmi": 0.01393855},
+           "L_terms": {"intercept": -13.31765468, "ln_height_cm": 1.95090989, "age": 0.00290066, "bmi": 0.09025663}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": -0.83145893, "age": 0.00323177, "bmi": 0.03467964},
+           "S_terms": {"intercept": -2.84910312, "ln_height_cm": 0.40127455, "age": 0.0031138, "bmi": -0.0132188},
+           "L_terms": {"intercept": -14.09705291, "ln_height_cm": 3.14540254, "age": -0.00341615, "bmi": -0.07434953}}
+        ]},
+        "AX": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 20.91145761, "ln_height_cm": -4.03054991, "age": 0.00493653, "bmi": 0.03880709},
+           "S_terms": {"intercept": -2.73623813, "height_cm": 0.00648946, "age": 0.00439438, "bmi": 0.02372895},
+           "L_terms": {"intercept": -6.16727771, "height_cm": 0.02410694, "age": 0.00095903, "bmi": 0.05306513}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 4.38084913, "height_cm": -0.02397973, "age": 0.00781428, "bmi": 0.03123407},
+           "S_terms": {"intercept": -2.11476391, "height_cm": 0.00442156, "age": 0.00434425, "bmi": 0.02072464},
+           "L_terms": {"intercept": 1.27383151, "height_cm": -0.01148621, "age": 0.0009999, "bmi": 0.01348385}}
+        ]},
+        "AX_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 3.24639887, "height_cm": -0.02255135, "age": 0.00353493, "ln_bmi": 0.55379764},
+           "S_terms": {"intercept": -4.98060228, "height_cm": 0.00629764, "age": 0.00373669, "ln_bmi": 0.82241236},
+           "L_terms": {"intercept": -2.05010797, "height_cm": 0.01289745, "age": -0.00668263, "ln_bmi": -0.09265284}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 5.06767152, "height_cm": -0.02664303, "age": 0.00534606, "bmi": 0.02388147},
+           "S_terms": {"intercept": -1.97691845, "height_cm": 0.00448286, "age": 0.00319525, "bmi": 0.00634517},
+           "L_terms": {"intercept": 4.35751132, "height_cm": -0.02574285, "age": -0.00874071, "bmi": 0.00382634}}
+        ]},
+        "AX_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 3.79966573, "height_cm": -0.01992129, "age": 0.00785441, "bmi": 0.02634294},
+           "S_terms": {"intercept": -10.01117836, "ln_height_cm": 1.78905416, "age": 0.00261346, "bmi": 0.00724831},
+           "L_terms": {"intercept": 14.83333692, "ln_height_cm": -3.11200411, "age": 0.00737823, "bmi": 0.02440564}}
+        ]},
+        "Fres": {"class": "frequency", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 8.851027, "ln_height_cm": -1.36576357, "age": 0.00275046, "bmi": 0.02457601},
+           "S_terms": {"intercept": -3.36340912, "height_cm": 0.00578775, "age": 0.00406375, "bmi": 0.02124452},
+           "L_terms": {"intercept": -22.70414733, "height_cm": 0.08760471, "age": 0.01426116, "bmi": 0.21255987}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 3.26022419, "height_cm": -0.00786778, "age": 0.00346721, "bmi": 0.01842025},
+           "S_terms": {"intercept": -2.69541069, "height_cm": 0.00254021, "age": 0.0053061, "bmi": 0.01888391},
+           "L_terms": {"intercept": 1.99915858, "height_cm": -0.03013993, "age": 0.01303588, "bmi": 0.05661649}}
+        ]},
+        "Fres_insp": {"class": "frequency", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 8.10264336, "ln_height_cm": -1.18622244, "age": 0.0023003, "bmi": 0.01537913},
+           "S_terms": {"intercept": -6.13140672, "height_cm": 0.00308264, "age": 0.0049477, "ln_bmi": 1.06935626},
+           "L_terms": {"intercept": -22.32757355, "height_cm": 0.09893159, "age": 0.00500853, "ln_bmi": 1.02204019}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 3.53230849, "height_cm": -0.00892541, "age": 0.00243318, "bmi": 0.01329424},
+           "S_terms": {"intercept": -2.48898208, "height_cm": -0.00052224, "age": 0.00507977, "bmi": 0.01880883},
+           "L_terms": {"intercept": 6.55558029, "height_cm": -0.05558684, "age": -0.01561164, "bmi": 0.07689867}}
+        ]},
+        "Fres_exp": {"class": "frequency", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 3.09900078, "height_cm": -0.0080419, "age": 0.00301917, "bmi": 0.03038204},
+           "S_terms": {"intercept": -3.28793957, "height_cm": 0.00834575, "age": 0.00371846, "bmi": 0.00901426},
+           "L_terms": {"intercept": -22.11781688, "height_cm": 0.079162, "age": 0.011614, "bmi": 0.26153387}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 1.0},
+           "M_terms": {"intercept": 2.9638292, "height_cm": -0.00646981, "age": 0.00402032, "bmi": 0.02231564},
+           "S_terms": {"intercept": -2.76200391, "height_cm": 0.00579238, "age": 0.00393301, "bmi": 0.0120945},
+           "L_terms": {"intercept": -0.73722642, "height_cm": -0.01662031, "age": 0.02134719, "bmi": 0.06667514}}
+        ]},
+        "R11": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.00281496, "height_cm": -0.01146274, "age": -0.00236143, "ln_bmi": 0.62277905},
+           "S_terms": {"intercept": 0.14838989, "height_cm": -0.00468145, "age": 0.00174169, "ln_bmi": -0.25023483},
+           "L_terms": {"intercept": 11.53948419, "height_cm": -0.02258354, "age": 0.00181158, "ln_bmi": -2.45928703}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.55468797, "height_cm": -0.00579631, "age": -0.00128173, "bmi": 0.02334934},
+           "S_terms": {"intercept": -1.50409754, "height_cm": -0.00159016, "age": 0.00538724, "bmi": 0.0039368},
+           "L_terms": {"intercept": 0.0580996, "height_cm": -0.02320459, "age": 0.02235644, "bmi": 0.08854164}}
+        ]},
+        "R11_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 8.57611544, "ln_height_cm": -1.85544518, "ln_age": -0.12680687, "ln_bmi": 0.70532842},
+           "S_terms": {"intercept": 2.37011921, "ln_height_cm": -0.84236678, "ln_age": 0.13616524, "ln_bmi": -0.00617851},
+           "L_terms": {"intercept": 33.94584184, "ln_height_cm": -5.12592013, "ln_age": -0.08451133, "ln_bmi": -2.32479417}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.73297743, "height_cm": -0.00758474, "age": -0.00217879, "bmi": 0.02459477},
+           "S_terms": {"intercept": -0.54368917, "height_cm": -0.0073432, "age": 0.00742722, "bmi": -0.00286585},
+           "L_terms": {"intercept": 1.62682829, "height_cm": -0.02929272, "age": 0.02178567, "bmi": 0.05669615}}
+        ]},
+        "R11_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.18801131, "height_cm": -0.01197087, "age": -0.00211382, "ln_bmi": 0.60965931},
+           "S_terms": {"intercept": 0.39549368, "height_cm": -0.00349537, "age": 0.00184168, "ln_bmi": -0.36464944},
+           "L_terms": {"intercept": 8.06671547, "height_cm": -0.01687045, "age": 0.00366865, "ln_bmi": -1.73142965}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.53619287, "height_cm": -0.0051945, "age": -0.00097069, "bmi": 0.0226295},
+           "S_terms": {"intercept": -1.92769365, "height_cm": 0.00172597, "age": 0.00443763, "bmi": 0.00445193},
+           "L_terms": {"intercept": 0.9290282, "height_cm": -0.0254204, "age": 0.01934689, "bmi": 0.07677458}}
+        ]},
+        "X11": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 2.0},
+           "M_terms": {"intercept": 0.13752425, "height_cm": -0.00529987, "age": 0.00181132, "ln_bmi": 0.4404226},
+           "S_terms": {"intercept": -2.35407112, "height_cm": -0.0015002, "age": -0.00049056, "ln_bmi": 0.22463087},
+           "L_terms": {"intercept": -17.43071466, "height_cm": 0.01869517, "age": -0.02854541, "ln_bmi": 4.60218203}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 2.0},
+           "M_terms": {"intercept": 1.29563176, "height_cm": -0.00665404, "age": 0.00288121, "bmi": 0.01672132},
+           "S_terms": {"intercept": -2.20100707, "height_cm": 0.0008043, "age": 0.00205894, "bmi": 0.01010552},
+           "L_terms": {"intercept": 2.18048689, "height_cm": -0.01465916, "age": -0.00571084, "bmi": 0.00327076}}
+        ]},
+        "X11_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 2.0},
+           "M_terms": {"intercept": 0.44127501, "height_cm": -0.00551912, "age": 0.00167695, "ln_bmi": 0.34445628},
+           "S_terms": {"intercept": -2.69046925, "height_cm": -0.00251258, "age": -0.0017803, "ln_bmi": 0.34167357},
+           "L_terms": {"intercept": 2.16967941, "height_cm": -0.03764414, "age": -0.04444031, "ln_bmi": 2.14093167}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 2.0},
+           "M_terms": {"intercept": 1.6917582, "height_cm": -0.0087423, "age": 0.00225905, "bmi": 0.01314615},
+           "S_terms": {"intercept": -1.6104511, "height_cm": -0.00232312, "age": 0.00086841, "bmi": 0.00236462},
+           "L_terms": {"intercept": 4.24610126, "height_cm": -0.02054413, "age": -0.01945096, "bmi": -0.01526315}}
+        ]},
+        "X11_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 2.0},
+           "M_terms": {"intercept": -0.05822419, "height_cm": -0.00548125, "age": 0.00189582, "ln_bmi": 0.52033156},
+           "S_terms": {"intercept": -3.10461356, "height_cm": 0.00094651, "age": 0.00098929, "ln_bmi": 0.3474441},
+           "L_terms": {"intercept": -16.93105934, "height_cm": 0.00960498, "age": -0.02166781, "ln_bmi": 4.71487843}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 2.0},
+           "M_terms": {"intercept": 1.07308333, "height_cm": -0.00540734, "age": 0.00319297, "bmi": 0.01838456},
+           "S_terms": {"intercept": -2.14167319, "height_cm": 0.00115911, "age": 0.00217212, "bmi": 0.01156011},
+           "L_terms": {"intercept": -0.44258867, "height_cm": 0.00048668, "age": -0.00018375, "bmi": -0.00732925}}
+        ]},
+        "R19": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.27951905, "height_cm": -0.00820938, "age": -0.0039901, "ln_bmi": 0.37558144},
+           "S_terms": {"intercept": -0.14097405, "height_cm": -0.00801434, "age": 0.00087917, "ln_bmi": 0.00209106},
+           "L_terms": {"intercept": 15.63479312, "height_cm": -0.02224631, "age": 0.00523639, "ln_bmi": -3.80871449}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.39302074, "height_cm": -0.00335726, "age": -0.0031946, "bmi": 0.01774499},
+           "S_terms": {"intercept": -1.33716494, "height_cm": -0.00342657, "age": 0.00579859, "bmi": 0.00435456},
+           "L_terms": {"intercept": 0.40685746, "height_cm": -0.03221751, "age": 0.01570796, "bmi": 0.14510401}}
+        ]},
+        "R19_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 0.78782074, "height_cm": -0.00745494, "age": -0.0045303, "ln_bmi": 0.4768522},
+           "S_terms": {"intercept": -0.98162896, "height_cm": -0.007365, "age": 0.00151319, "ln_bmi": 0.20807671},
+           "L_terms": {"intercept": 9.54369498, "height_cm": -0.00852946, "age": 0.00092186, "ln_bmi": -2.60714556}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.45045876, "height_cm": -0.00424112, "age": -0.00386097, "bmi": 0.01920987},
+           "S_terms": {"intercept": -0.98433566, "height_cm": -0.00524968, "age": 0.00687823, "bmi": -0.00073364},
+           "L_terms": {"intercept": -1.49767995, "height_cm": -0.01332369, "age": 0.01261534, "bmi": 0.10184634}}
+        ]},
+        "R19_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 1.50926465, "height_cm": -0.00874047, "age": -0.00370184, "ln_bmi": 0.34051807},
+           "S_terms": {"intercept": 0.31634053, "height_cm": -0.00712587, "age": 0.00133162, "ln_bmi": -0.17358968},
+           "L_terms": {"intercept": 14.55939378, "height_cm": -0.0244519, "age": 0.00627431, "ln_bmi": -3.39524884}},
+          {"type": "lms", "sex": "F", "shift": {"a": 1.0, "b": 0.0},
+           "M_terms": {"intercept": 0.87103657, "age": -0.00275641, "bmi": 0.01780603},
+           "S_terms": {"intercept": -1.83708311, "age": 0.00532584, "bmi": 0.0057383},
+           "L_terms": {"intercept": -4.82564466, "age": 0.0191248, "bmi": 0.13537222}}
+        ]},
+        "X19": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 3.0},
+           "M_terms": {"intercept": 4.67984333, "ln_height_cm": -0.82989887, "age": 0.00213489, "bmi": 0.01357915},
+           "S_terms": {"intercept": 0.75597345, "height_cm": -0.00319543, "age": -0.0048328, "ln_bmi": -0.54907627},
+           "L_terms": {"intercept": -7.94388629, "height_cm": 0.03431916, "age": -0.02686528, "ln_bmi": 1.1337555}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 3.0},
+           "M_terms": {"intercept": 0.83979527, "height_cm": -0.00387311, "age": 0.00396443, "bmi": 0.01643385},
+           "S_terms": {"intercept": -1.44128809, "height_cm": 0.00051256, "age": -0.00288493, "bmi": -0.00179092},
+           "L_terms": {"intercept": 4.63067019, "height_cm": -0.02507764, "age": 0.01257941, "bmi": -0.023041}}
+        ]},
+        "X19_insp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 3.0},
+           "M_terms": {"intercept": 4.3761169, "ln_height_cm": -0.78285108, "age": 0.00273934, "bmi": 0.01223815},
+           "S_terms": {"intercept": 0.87861216, "height_cm": -0.00609491, "age": -0.00779031, "ln_bmi": -0.40910352},
+           "L_terms": {"intercept": 7.23804086, "height_cm": -0.01036332, "age": -0.01482307, "ln_bmi": -1.21408809}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 3.0},
+           "M_terms": {"intercept": 0.93484034, "height_cm": -0.0049375, "age": 0.00402236, "bmi": 0.01544202},
+           "S_terms": {"intercept": -1.59114672, "height_cm": 0.0020115, "age": -0.00155603, "bmi": -0.00964706},
+           "L_terms": {"intercept": 4.57704834, "height_cm": -0.02429995, "age": 0.00609191, "bmi": -0.01386948}}
+        ]},
+        "X19_exp": {"class": "pressure", "models": [
+          {"type": "lms", "sex": "M", "shift": {"a": -1.0, "b": 3.0},
+           "M_terms": {"intercept": 4.9587382, "ln_height_cm": -0.87773249, "age": 0.00193002, "bmi": 0.01444192},
+           "S_terms": {"intercept": -0.15213152, "height_cm": 0.00155612, "age": -0.0032041, "ln_bmi": -0.51879434},
+           "L_terms": {"intercept": -9.55584499, "height_cm": 0.03307276, "age": -0.03064774, "ln_bmi": 1.65381693}},
+          {"type": "lms", "sex": "F", "shift": {"a": -1.0, "b": 3.0},
+           "M_terms": {"intercept": 0.7233585, "height_cm": -0.00287884, "age": 0.0039103, "bmi": 0.01708895},
+           "S_terms": {"intercept": -1.13751318, "height_cm": -0.00097971, "age": -0.00372866, "bmi": 0.00223205},
+           "L_terms": {"intercept": 0.0213995, "height_cm": 0.00133642, "age": 0.0110066, "bmi": -0.020271}}
+        ]}
+      },
+      "notes": [
+        "LMS: z = ((y'/M)^L - 1)/(L*S), y' = shifted value. X is shifted to 1 - X, so its raw z is sign-flipped here (orientation -1).",
+        "Male AX_exp not implemented: the published S formula duplicates the M formula (implied CoV about 3.5). Ask the authors or check the supplement.",
+        "Height range of the derivation sample is not published in the main text (male IQR 173-183 cm, female 160-169 cm); only age and BMI are range-checked.",
+        "R11, R19, X11, X19 (total and within-breath) from supplementary Tables S1-S2; X11 shift 2 - X, X19 shift 3 - X.",
+        "Both supplement worked examples (male R5 z = -2.375281; female X5_exp z = +1.839774 after orientation) are reproduced to 6 decimals."
+      ]
+    }
+  ]
+}
