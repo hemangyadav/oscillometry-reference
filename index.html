@@ -126,7 +126,7 @@ td.zc.ab { color: var(--low); }
 .legend i { display: inline-block; width: 18px; height: 9px; background: var(--band); vertical-align: -1px; margin-right: 5px; border-radius: 2px; }
 
 /* Equation card */
-.eq { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px 28px; }
+.eq { display: block; max-width: 760px; }
 .eq h3 { margin: 0 0 4px; font-size: 1.05rem; }
 .eq p { margin: 0 0 6px; max-width: 65ch; }
 .eq dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; margin: 8px 0 0; font-size: 0.86rem; }
@@ -136,13 +136,11 @@ td.zc.ab { color: var(--low); }
 a { color: var(--accent); }
 
 footer { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 10px; font-size: 0.8rem; color: var(--muted); }
-footer .ruo-line { color: var(--ink); font-weight: 700; font-size: 0.9rem; }
 footer ol { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
 footer p { margin: 0; max-width: 80ch; }
 #loadError { border: 1px solid var(--low); background: var(--low-soft); color: var(--ink); padding: 12px; border-radius: var(--r); }
 
 @media (max-width: 720px) {
-  .eq { grid-template-columns: 1fr; }
   h1 { font-size: 1.25rem; }
   td.meas input { width: 72px; }
   .swipe { display: block !important; }
@@ -269,13 +267,10 @@ footer p { margin: 0; max-width: 80ch; }
   </section>
 
   <footer>
-    <div class="ruo-line">Research use only, not for clinical decisions.</div>
-    <p>Everything runs in this browser tab. Nothing you enter is sent anywhere or stored; closing the page discards it. The page loads only its own files and makes no analytics or third-party requests.</p>
     <div>
       <div style="margin-bottom:4px">Equations</div>
       <ol id="cites"></ol>
     </div>
-    <p id="buildline"></p>
   </footer>
 </div>
 
@@ -297,7 +292,6 @@ footer p { margin: 0; max-width: 80ch; }
     Tremoflo: ["R7", "R13", "R17", "R23", "R29", "R31", "R37", "R41", "R7_R19", "X7", "X13", "X17"]
   };
   const DEVICE_UNIT = { Jaeger: "kPa", Resmon: "cmH2O", Tremoflo: "cmH2O" };
-  const PAPER1_ONLY = ["nowowiejska2008", "wu2022"];
 
   // Example values for illustration only (the Jaeger example shows one reactance flag)
   const EXAMPLES = {
@@ -363,7 +357,7 @@ footer p { margin: 0; max-width: 80ch; }
     for (const s of reg.sets) {
       const o = document.createElement("option");
       o.value = s.id;
-      o.textContent = s.label + (PAPER1_ONLY.includes(s.id) ? " · Paper 1 reproduction only" : "") + " · " + shortDevice(s.device_derived);
+      o.textContent = s.label + " · " + shortDevice(s.device_derived);
       grp.appendChild(o);
     }
     sel.appendChild(grp);
@@ -582,9 +576,6 @@ footer p { margin: 0; max-width: 80ch; }
       a.push('<div class="alert"><b>Different device.</b> ' + st.set.label + " was derived on " + st.set.device_derived +
         "; you are applying it to " + (st.device === "Tremoflo" ? "tremoflo" : st.device) + " data. Between-device offsets are not corrected.</div>");
     }
-    if (PAPER1_ONLY.includes(st.setId)) {
-      a.push('<div class="alert"><b>Paper 1 reproduction only.</b> ' + st.set.label + " is kept to reproduce the published pediatric comparison and is not used going forward.</div>");
-    }
     if (st.device === "Tremoflo" && !st.wave && (st.set.mode_params || []).length) {
       a.push('<div class="alert"><b>Waveform not set.</b> ' + st.set.label + " AX and Fres equations are waveform specific; choose AOS 5-37 or 7-41 to score them.</div>");
     }
@@ -604,8 +595,7 @@ footer p { margin: 0; max-width: 80ch; }
       ranges = ["M", "F"].filter((x) => s.valid[x]).map((x) => (x === "M" ? "Male: " : "Female: ") + rangeText(s, x)).join("<br>");
     } else ranges = rangeText(s, "M");
     const left =
-      "<div><h3>" + s.label + (st.eqChoice === "auto" ? ' <span class="tag def">Default</span>' : "") +
-      (PAPER1_ONLY.includes(s.id) ? ' <span class="tag p1">Paper 1 reproduction only</span>' : "") + "</h3>" +
+      "<div><h3>" + s.label + (st.eqChoice === "auto" ? ' <span class="tag def">Default</span>' : "") + "</h3>" +
       "<p>" + s.citation + ". " + link(s.doi) + (s.pmid ? " · " + pm(s.pmid) : "") +
       (s.correction_doi ? "<br>Correction: " + link(s.correction_doi) + (s.correction_pmid ? " · " + pm(s.correction_pmid) : "") : "") + "</p>" +
       "<dl>" +
@@ -617,8 +607,7 @@ footer p { margin: 0; max-width: 80ch; }
       "<dt>Within-breath</dt><dd>" + (within ? "Yes" : "No") + "</dd>" +
       "<dt>Parameters</dt><dd>" + [...new Set(Object.keys(s.parameters).map((k) => k.replace(/_(insp|exp)$/, "")))].map(displayName).join(", ") + (within ? " (whole breath; insp and exp where published)" : "") + "</dd>" +
       "</dl></div>";
-    const right = "<div><h2>Notes</h2><ul>" + (s.notes || []).map((n) => "<li>" + escapeHtml(n) + "</li>").join("") + "</ul></div>";
-    $("eqcard").innerHTML = left + right;
+    $("eqcard").innerHTML = left;
   }
   function escapeHtml(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
@@ -693,9 +682,7 @@ footer p { margin: 0; max-width: 80ch; }
     $("cites").innerHTML = reg.sets.map((s) =>
       "<li>" + escapeHtml(s.citation) + '. <a href="https://doi.org/' + s.doi + '" target="_blank" rel="noopener noreferrer">doi:' + s.doi + "</a>" +
       (s.correction_doi ? '; correction <a href="https://doi.org/' + s.correction_doi + '" target="_blank" rel="noopener noreferrer">doi:' + s.correction_doi + "</a>" : "") +
-      (PAPER1_ONLY.includes(s.id) ? " (Paper 1 reproduction only)" : "") + "</li>").join("");
-    $("buildline").textContent = "Coefficients: coefficients.json, built " + reg.built + " (schema " + reg.schema_version + "). " +
-      "Scoring engine js/refeq.js is tested against the golden reference cases before each release.";
+      "</li>").join("");
   }
 
   $("stripHead").innerHTML = stripHeader();
